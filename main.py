@@ -66,6 +66,15 @@ class DecisionTree:
         """
         return len(set(input_list)) == 1
 
+    def print_subtree(self, node=self.root, depth=0):
+        """
+        Prints the subtree starting at the specified
+        """
+        if node:
+            print(f"Depth: {node.depth} Data: {node.data}")
+            self.print_subtree(node.left, depth + 1)
+            self.print_subtree(node.right, depth + 1)
+
 # Main
 if __name__ == "__main__":
     print("INF264 Project 1")
