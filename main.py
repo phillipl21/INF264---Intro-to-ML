@@ -3,6 +3,7 @@
 
 # Import libraries
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 # Classes
@@ -84,7 +85,7 @@ class DecisionTree:
         else:
             return 1
 
-    def print_subtree(self, node=self.root, depth=0):
+    def print_subtree(self, node, depth=0):
         """
         Prints the subtree starting at the specified node
         """
@@ -92,6 +93,16 @@ class DecisionTree:
             print(f"Depth: {node.depth} Data: {node.data}")
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
+
+# Other functions
+# TODO: finish function
+def read_data(filename):
+    """
+    Read data from a file and return a populated feature (X) and label matrix (y)
+    """
+    X, y = [], []
+    df = pd.read_csv("wine_dataset.csv")
+    return X, y
 
 # Main
 if __name__ == "__main__":
