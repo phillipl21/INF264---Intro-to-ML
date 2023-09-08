@@ -26,10 +26,12 @@ class DecisionTree:
         node: the starting node of the tree (can be a subset of another tree)
         """
         # If all data points have the same label, return a leaf with that label
-        if _all_same_value(y):
+        if all_same_value(y):
             return node
 
         # Elif all data points have identical feature values, return a leaf with the most common label
+        if identical_features(x):
+            return most_common_label(y)
 
         # Else create decision tree
         # - Choose a feature with the most infomation gain
@@ -60,15 +62,31 @@ class DecisionTree:
         pass
 
     # Helper methods
-    def _all_same_value(self, input_list):
+    def all_same_value(self, input_list):
         """
-        Returns true if the input list has all of the same value
+        Returns True if the input list has all of the same value
         """
         return len(set(input_list)) == 1
 
+    # TODO: finish function
+    def identical_features(self, X):
+        """
+        Return True if all the features in each column of X are identical
+        """
+        pass
+
+    def most_common_label(self, y):
+        """
+        Return 0 or 1 depending on whichever is the most common label
+        """
+        if y.count(0) > len(y) / 2:
+            return 0
+        else:
+            return 1
+
     def print_subtree(self, node=self.root, depth=0):
         """
-        Prints the subtree starting at the specified
+        Prints the subtree starting at the specified node
         """
         if node:
             print(f"Depth: {node.depth} Data: {node.data}")
