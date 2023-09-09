@@ -3,8 +3,8 @@
 
 # Import libraries
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
+import csv
 
 # Classes
 class Node:
@@ -100,10 +100,30 @@ def read_data(filename):
     """
     Read data from a file and return a populated feature (X) and label matrix (y)
     """
+    # Feature and label matrices
     X, y = [], []
-    df = pd.read_csv("wine_dataset.csv")
+
+    # Read data from CSV file line by line
+    with open(filename, newline='') as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        csv_as_list = list(csv_reader)
+
+        for i in range(len(csv_as_list)):
+            if i > 0:
+                # Add labels to y
+                split = csv_as_list[i][0].split(',')
+                y.append(int(split.pop()))
+                print(split)
+
+                # Add labels to X
+                features = [float(x_val) for x_val in split]
+                X.append(features)
+
     return X, y
 
 # Main
 if __name__ == "__main__":
     print("INF264 Project 1")
+    csv_file = "wine_dataset.csv"
+    X, y = read_data(csv_file)
+    print(X)
