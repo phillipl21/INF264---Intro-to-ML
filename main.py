@@ -4,7 +4,9 @@
 # Import libraries
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
+import random
+
+from csv import reader
 
 # Classes
 class Node:
@@ -94,6 +96,27 @@ class DecisionTree:
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
 
+    def train_validation_split(self, X, y, pct_validation):
+        """
+        Split X and y into train and validation sets. 
+        pct_validation determines how much of the data should be validation set
+
+        Return the train set as the first two values
+        and the validation set as the last two values
+        """
+        X_validation, y_validation = [], []
+        validation_set_size = round(len(X) * pct_validation)
+
+        # Pick validation_set_size elements and add to validation arrays
+        while len(X_validation) < validation_set_size:
+            random_index = random.randrange(len(X))
+            X_validation.append(X.pop(random_index))
+            y_validation.append(y.pop(random_index))
+        
+        train_set = X, y
+        validation_set = X_validation, y_validation
+        return train_set, validation_set
+
 # Other functions
 # TODO: finish function
 def read_data(filename):
@@ -105,7 +128,7 @@ def read_data(filename):
 
     # Read data from CSV file line by line
     with open(filename, newline='') as csvfile:
-        csv_reader = csv.reader(csvfile, delimiter=' ', quotechar='|')
+        csv_reader = reader(csvfile, delimiter=' ', quotechar='|')
         csv_as_list = list(csv_reader)
 
         for i in range(len(csv_as_list)):
