@@ -30,13 +30,15 @@ class DecisionTree:
         x and y: a list of data representing input and output
         node: the starting node of the tree (can be a subset of another tree)
         """
+        # Base cases:
+        
         # If all data points have the same label, return a leaf with that label
         if len(set(y)) == 1:
             return node
 
         # Elif all data points have identical feature values, return a leaf with the most common label
-        elif identical_features(x):
-            return most_common_label(y)
+        elif self.identical_features(x):
+            return self.most_common_label(y)
 
         # Else create decision tree
         # - Choose a feature with the most infomation gain
@@ -55,6 +57,7 @@ class DecisionTree:
         - y: a label vector of categorical variables
         - impurity_measure: determines how to split the branches
         """
+        
         pass
 
     # TODO: finish function
@@ -125,7 +128,17 @@ class DecisionTree:
             return 0
         else:
             return 1
-
+    def has_same_labe(self, y):
+        """
+        Check whether the labels in a collection are the same or not
+        """
+        for label in y:
+            # compare current label with first label
+            if label is not y[0]: 
+                return  False
+        
+        return true
+    
     def print_subtree(self, node, depth=0):
         """
         Prints the subtree starting at the specified node
@@ -186,4 +199,5 @@ if __name__ == "__main__":
     print("INF264 Project 1")
     csv_file = "wine_dataset.csv"
     X, y = read_data(csv_file)
-    print(X)
+    # print(X)
+    print(y)
