@@ -90,9 +90,7 @@ class DecisionTree:
                     return False
             
         return True
-            
 
-    # TODO: finish function
     def calculate_entropy(self, x, i):
         """
         Return a single value for entropy from a column of interest from X
@@ -112,7 +110,7 @@ class DecisionTree:
         total_count = len(column)
         
         # Iteratively calculate the entropy for a different of x and sum it.
-        # entropy -= since it's the same as multiplying the overal sum by -1
+        # entropy -= since it's the same as multiplying the overall sum by -1
         for count in values_dict.values():
             probability = count / total_count
             entropy -= probability * np.log2(probability)
