@@ -55,6 +55,7 @@ class DecisionTree:
         - y: a label vector of categorical variables
         - impurity_measure: determines how to split the branches
         """
+        
         pass
 
     # TODO: finish function
@@ -127,7 +128,17 @@ class DecisionTree:
             return 0
         else:
             return 1
-
+    def has_same_labe(self, y):
+        """
+        Check whether the labels in a collection are the same or not
+        """
+        for label in y:
+            # compare current label with first label
+            if label is not y[0]: 
+                return  False
+        
+        return true
+    
     def print_subtree(self, node, depth=0):
         """
         Prints the subtree starting at the specified node
@@ -188,4 +199,5 @@ if __name__ == "__main__":
     print("INF264 Project 1")
     csv_file = "wine_dataset.csv"
     X, y = read_data(csv_file)
-    print(X)
+    # print(X)
+    print(y)
