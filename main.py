@@ -120,10 +120,10 @@ class DecisionTree:
         # entropy -= since it's the same as multiplying the overall sum by -1
         for count in values_dict.values():
             probability = count / total_count
-            entropy -= probability * np.log2(probability)
+            entropy += probability * np.log2(probability)
         
-        return entropy
-
+        return entropy * - 1
+    
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
