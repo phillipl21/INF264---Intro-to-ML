@@ -16,6 +16,9 @@ class Node:
         self.left = left
         self.right = right
         pass
+    
+    def is_leaf(self):
+        return self.right == None and self.left == None
 
 class DecisionTree:
     def __init__(self):
@@ -137,7 +140,7 @@ class DecisionTree:
             if label is not y[0]: 
                 return  False
         
-        return true
+        return True
     
     def print_subtree(self, node, depth=0):
         """
