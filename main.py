@@ -10,8 +10,9 @@ from csv import reader
 
 # Classes
 class Node:
-    def __init__(self, data, left=None, right=None):
+    def __init__(self, label, data, left=None, right=None):
         self.data = data
+        self.label = label
         self.left = left
         self.right = right
         pass
@@ -45,7 +46,7 @@ class DecisionTree:
             pass
 
     # TODO: finish function
-    def learn(self, X, y, impurity_measure='entropy'):
+    def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
         Create a decision tree based on input data and an impurity measure
 
@@ -75,7 +76,21 @@ class DecisionTree:
         """
         Return True if all the features in each column of X are identical
         """
-        pass
+        if X is None or X[0] is None: # Null array
+            print("identical_features() - No values found in array.")
+            return False
+        
+        # Get horizontal length of 2D array
+        for i in range(len(X[0])):
+            # Iterate through the columns of the array
+            column = [row[i] for row in X]
+            # Check for value uniqueness by comparing with the first value 
+            for val in column:
+                if val is not column[0]:
+                    return False
+            
+        return True
+            
 
     # TODO: finish function
     def calculate_entropy(self, x, i):
