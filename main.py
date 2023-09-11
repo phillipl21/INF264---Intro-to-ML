@@ -16,7 +16,7 @@ class Node:
         self.left = left
         self.right = right
         pass
-    
+
     def is_leaf(self):
         return self.right == None and self.left == None
 
@@ -123,7 +123,7 @@ class DecisionTree:
             entropy += probability * np.log2(probability)
         
         return entropy * - 1
-    
+
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
@@ -170,7 +170,7 @@ class DecisionTree:
         for label in y:
             # compare current label with first label
             if label is not y[0]: 
-                return  False
+                return False
         
         return True
     
