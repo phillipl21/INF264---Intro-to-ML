@@ -72,6 +72,12 @@ class DecisionTree:
         """
         pass
 
+    def calc_entropy(self, x, y):
+        """
+        Calculate entropy 
+        """
+        pass
+
     def most_common_label(self, y):
         """
         Return 0 or 1 depending on whichever is the most common label
