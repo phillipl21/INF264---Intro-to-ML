@@ -20,6 +20,7 @@ class DecisionTree:
     def __init__(self):
         self.root = Node()
 
+    # TODO: finish function
     def create_tree(self, x, y, node):
         """
         Create a decision tree based on input data
@@ -33,14 +34,17 @@ class DecisionTree:
             return node
 
         # Elif all data points have identical feature values, return a leaf with the most common label
-        if identical_features(x):
+        elif identical_features(x):
             return most_common_label(y)
 
         # Else create decision tree
         # - Choose a feature with the most infomation gain
         # - Split the data based on the feature's value and add a branch for each subset of data
         # - For each branch, call the algorithm recursively on the data points for that specific branch
+        else:
+            pass
 
+    # TODO: finish function
     def learn(self, X, y, impurity_measure='entropy'):
         """
         Create a decision tree based on input data and an impurity measure
@@ -52,6 +56,7 @@ class DecisionTree:
         """
         pass
 
+    # TODO: finish function
     def predict(self, x):
         """
         Predicts the class label based on a single data point x
@@ -72,6 +77,7 @@ class DecisionTree:
         """
         pass
 
+    # TODO: finish function
     def calculate_entropy(self, x, i):
         """
         Return a single value for entropy from a column of interest from X
@@ -138,7 +144,6 @@ class DecisionTree:
         return train_set, validation_set
 
 # Other functions
-# TODO: finish function
 def read_data(filename):
     """
     Read data from a file and return a populated feature (X) and label matrix (y)
