@@ -5,6 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import math
 
 from csv import reader
 
@@ -107,22 +108,21 @@ class DecisionTree:
         
         # Count the frequency of each unique value in the data
         values_dict = {}
-        for i in column:
-            if i in values_dict:
-                values_dict[i] += 1
+        for count in column:
+            if count in values_dict:
+                values_dict[count] += 1
             else:
-                values_dict[i] = 1
+                values_dict[count] = 1
         
         entropy = 0.0
         total_count = len(column)
         
         # Iteratively calculate the entropy for a different of x and sum it.
-        # entropy -= since it's the same as multiplying the overall sum by -1
         for count in values_dict.values():
             probability = count / total_count
-            entropy += probability * np.log2(probability)
-        
-        return entropy * - 1
+            if probability != 0:
+                entropy += probability * math.log2(probability)
+        return -entropy
     
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
@@ -238,3 +238,4 @@ if __name__ == "__main__":
     tree = DecisionTree()
     calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
     print("calc_entropy_result =", calc_entropy_result)
+    print("entropy sample: ", tree.calculate_entropy(X, 0))
