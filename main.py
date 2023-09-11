@@ -139,12 +139,11 @@ def read_data(filename):
         for i in range(len(csv_as_list)):
             if i > 0:
                 # Add labels to y
-                split = csv_as_list[i][0].split(',')
-                y.append(int(split.pop()))
-                print(split)
+                row = csv_as_list[i][0].split(',')
+                y.append(float(row.pop()))
 
                 # Add labels to X
-                features = [float(x_val) for x_val in split]
+                features = [float(x_val) for x_val in row]
                 X.append(features)
 
     return X, y
