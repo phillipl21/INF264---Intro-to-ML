@@ -78,11 +78,31 @@ class DecisionTree:
         pass
 
     # TODO: finish function
-    def calc_entropy(self, x, y):
+    def calculate_entropy(self, x, i):
         """
-        Calculate entropy 
+        Return a single value for entropy from a column of interest from X
         """
-        pass
+        # Get the column of interest from the table X
+        column = [row[i] for row in x]
+        
+        # Count the frequency of each unique value in the data
+        values_dict = {}
+        for i in column:
+            if i in values_dict:
+                values_dict[i] += 1
+            else:
+                values_dict[i] = 1
+        
+        entropy = 0.0
+        total_count = len(column)
+        
+        # Iteratively calculate the entropy for a different of x and sum it.
+        # entropy -= since it's the same as multiplying the overal sum by -1
+        for count in values_dict.values():
+            probability = count / total_count
+            entropy -= probability * np.log2(probability)
+        
+        return entropy
 
     def most_common_label(self, y):
         """
