@@ -128,7 +128,7 @@ class DecisionTree:
             return 0
         else:
             return 1
-    def has_same_labe(self, y):
+    def has_same_label(self, y):
         """
         Check whether the labels in a collection are the same or not
         """
