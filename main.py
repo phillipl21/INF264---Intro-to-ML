@@ -3,6 +3,7 @@
 
 # Import libraries
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import random
 
@@ -171,9 +172,9 @@ class DecisionTree:
             # compare current label with first label
             if label is not y[0]: 
                 return False
-        
+
         return True
-    
+
     def print_subtree(self, node, depth=0):
         """
         Prints the subtree starting at the specified node
@@ -212,20 +213,16 @@ def read_data(filename):
     # Feature and label matrices
     X, y = [], []
 
-    # Read data from CSV file line by line
-    with open(filename, newline='') as csvfile:
-        csv_reader = reader(csvfile, delimiter=' ', quotechar='|')
-        csv_as_list = list(csv_reader)
+    df = pd.read_csv("wine_dataset.csv")
 
-        for i in range(len(csv_as_list)):
-            if i > 0:
-                # Add labels to y
-                row = csv_as_list[i][0].split(',')
-                y.append(float(row.pop()))
+    for i in range(len(df)):
+        # Add labels to y
+        row = df.iloc[i]
+        y.append(float(row.pop('type')))
 
-                # Add labels to X
-                features = [float(x_val) for x_val in row]
-                X.append(features)
+        # Add labels to X
+        features = [float(x_val) for x_val in row]
+        X.append(features)
 
     return X, y
 
@@ -233,7 +230,7 @@ def read_data(filename):
 if __name__ == "__main__":
     print("INF264 Project 1")
     csv_file = "wine_dataset.csv"
-    X, y = read_data(csv_file)
+    # X, y = read_data(csv_file)
 
     tree = DecisionTree()
     calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
