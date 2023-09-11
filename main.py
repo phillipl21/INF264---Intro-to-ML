@@ -29,7 +29,7 @@ class DecisionTree:
         node: the starting node of the tree (can be a subset of another tree)
         """
         # If all data points have the same label, return a leaf with that label
-        if all_same_value(y):
+        if len(set(y)) == 1:
             return node
 
         # Elif all data points have identical feature values, return a leaf with the most common label
@@ -65,12 +65,6 @@ class DecisionTree:
         pass
 
     # Helper methods
-    def all_same_value(self, input_list):
-        """
-        Returns True if the input list has all of the same value
-        """
-        return len(set(input_list)) == 1
-
     # TODO: finish function
     def identical_features(self, X):
         """
