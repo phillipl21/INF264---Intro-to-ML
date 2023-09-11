@@ -22,7 +22,8 @@ class Node:
 
 class DecisionTree:
     def __init__(self):
-        self.root = Node()
+        self.root = Node(None, None)
+        self.X, self.y = read_data("wine_dataset.csv")
 
     # TODO: finish function
     def create_tree(self, x, y, node):
@@ -123,6 +124,36 @@ class DecisionTree:
         
         return entropy
 
+    # TODO: figure out calculate_entropy function
+    # TODO: determine how to split data based off information gain
+    def calculate_optimal_entropy_split(self, X, y):
+        """
+        Return the best feature to split at and what value to split at
+        """
+        # Get total entropy for y
+        proportion_white = y.count(0) / len(y)
+        proportion_red = y.count(1) / len(y)
+
+        total_entropy = -proportion_white * np.log2(proportion_white) - proportion_red * np.log2(proportion_red)
+
+        # Calculate information gain for each feature
+        optimal_info_gain, optimal_col_index = 0, 0
+
+        for col_index in range(len(X[0])):
+            col_entropy = self.calculate_entropy(X, col_index)
+            information_gain = total_entropy - col_entropy
+
+            print("col_entropy =", col_entropy)
+            print("information_gain =", information_gain)
+
+            # Update optimal information gain and column index
+            if information_gain > optimal_info_gain:
+                optimal_info_gain = information_gain
+                optimal_col_index = col_index
+
+        # Return feature with the best information gain
+        return optimal_col_index
+
     def most_common_label(self, y):
         """
         Return 0 or 1 depending on whichever is the most common label
@@ -131,6 +162,7 @@ class DecisionTree:
             return 0
         else:
             return 1
+
     def has_same_label(self, y):
         """
         Check whether the labels in a collection are the same or not
@@ -202,5 +234,7 @@ if __name__ == "__main__":
     print("INF264 Project 1")
     csv_file = "wine_dataset.csv"
     X, y = read_data(csv_file)
-    # print(X)
-    print(y)
+
+    tree = DecisionTree()
+    calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
+    print("calc_entropy_result =", calc_entropy_result)
