@@ -52,7 +52,23 @@ class DecisionTree:
         # - Choose a feature with the most infomation gain
         # - Split the data based on the feature's value and add a branch for each subset of data
         # - For each branch, call the algorithm recursively on the data points for that specific branch
-
+        
+        # For pruning, need to run a majority_label function
+        # Split data in 2 - split either using Gini Index or Entropy based on 
+        # chosen parameter. Will likely require helper function to figure
+        # out the best way to split.
+        optimal_column = self.calculate_optimal_tree_split(X, y)
+        x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_column)
+        
+        # Run create_tree recursively right and left
+        # IF Condition
+            # node.left = Node()
+            # self.create_tree(x_1, y_1, node.left)
+        # ELSE IF Condition
+            # node.right = Node()
+            # self.create_tree(x_2, y_2, node.right)
+        
+        
     # TODO: finish function
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
@@ -63,6 +79,8 @@ class DecisionTree:
         - y: a label vector of categorical variables
         - impurity_measure: determines how to split the branches
         """
+        # Store this for later functions in the class
+        self.impurity_measure = impurity_measure
         
         pass
 
@@ -99,6 +117,29 @@ class DecisionTree:
                     return False
             
         return True
+    
+    def split_data(self, X, y, optimal_column):
+        # Create lists for splitting the data into 2 parts
+        x_1, y_1 = [], []
+        x_2, y_2 = [], []
+        
+        # Get split_threshold
+        column_values = [row[optimal_column] for row in X]
+        split_threshold = np.median(optimal_column)
+        
+        # Divide features and corresponding labels into two sets
+        for i, row in enumerate(X):
+            feature = row[optimal_column]
+            
+            if feature > split_threshold:
+                x_1.append(row)
+                y_1.append(y[optimal_column])
+            elif feature <= split_threshold:
+                x_2.append(row)
+                y_2.append(y[optimal_column])
+        
+        return x_1, y_1, x_2, y_2
+        
 
     def calculate_entropy(self, x, y, col_index):
         """
@@ -148,7 +189,14 @@ class DecisionTree:
 
         total_entropy = proportion_below * entropy_below + proportion_above * entropy_above
         return total_entropy
-
+    
+    # TODO: add option for both Gini and Entropy based on earlier paraameters
+    def calculate_optimal_tree_split(self, X, y):
+        if self.impurity_measure == 'gini':
+            pass
+        elif self.impurity_measure == 'entropy':
+            return self.calculate_optimal_entropy_split(X, y)
+        
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
