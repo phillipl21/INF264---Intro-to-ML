@@ -52,9 +52,7 @@ class DecisionTree:
         # - Choose a feature with the most infomation gain
         # - Split the data based on the feature's value and add a branch for each subset of data
         # - For each branch, call the algorithm recursively on the data points for that specific branch
-        
-        
-        
+
     # TODO: finish function
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
@@ -134,14 +132,14 @@ class DecisionTree:
         
         # Calculate entropy for below subset
         total_below = below_white + below_red
-        p_below_white = below_white / total_below
-        p_below_red = below_red / total_below
+        p_below_white = below_white / total_below if total_below != 0 else 0
+        p_below_red = below_red / total_below if total_below != 0 else 0
         entropy_below = -p_below_white * np.log2(p_below_white) - p_below_red * np.log2(p_below_red)
 
         # Calculate entropy for above subset
         total_above = above_white + above_red
-        p_above_white = above_white / total_above
-        p_above_red = above_red / total_above
+        p_above_white = above_white / total_above if total_above != 0 else 0
+        p_above_red = above_red / total_above if total_above != 0 else 0
         entropy_above = -p_above_white * np.log2(p_above_white) - p_above_red * np.log2(p_above_red)
 
         # Calculate total weighted entropy
@@ -150,7 +148,6 @@ class DecisionTree:
 
         total_entropy = proportion_below * entropy_below + proportion_above * entropy_above
         return total_entropy
-
 
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
@@ -168,12 +165,10 @@ class DecisionTree:
         optimal_info_gain, optimal_col_index = 0, 0
 
         for col_index in range(len(X[0])):
-            col_entropy = 100000
-            # col_entropy = self.calculate_entropy(X, y, col_index)
+            col_entropy = self.calculate_entropy(X, y, col_index)
             information_gain = total_entropy - col_entropy
 
-            # print("col_entropy =", col_entropy)
-            # print("information_gain =", information_gain)
+            print(f"col_entropy = {col_entropy}, information_gain = {information_gain}")
 
             # Update optimal information gain and column index
             if information_gain > optimal_info_gain:
@@ -212,26 +207,15 @@ class DecisionTree:
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
 
-    def train_validation_split(self, X, y, pct_validation):
-        """
-        Split X and y into train and validation sets. 
-        pct_validation determines how much of the data should be validation set
+    # TODO: replace with train_test_split from scikit learn
+    # def train_validation_split(self, X, y, pct_validation):
+    #     """
+    #     Split X and y into train and validation sets. 
+    #     pct_validation determines how much of the data should be validation set
 
-        Return the train set as the first two values
-        and the validation set as the last two values
-        """
-        X_validation, y_validation = [], []
-        validation_set_size = round(len(X) * pct_validation)
-
-        # Pick validation_set_size elements and add to validation arrays
-        while len(X_validation) < validation_set_size:
-            random_index = random.randrange(len(X))
-            X_validation.append(X.pop(random_index))
-            y_validation.append(y.pop(random_index))
-        
-        train_set = X, y
-        validation_set = X_validation, y_validation
-        return train_set, validation_set
+    #     Return the train set as the first two values
+    #     and the validation set as the last two values
+    #     """
 
     # 1.3 - Pruning
     def prune_tree(self, X, y, tree):
@@ -267,6 +251,3 @@ if __name__ == "__main__":
     tree = DecisionTree()
     calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
     print("calc_entropy_result =", calc_entropy_result)
-
-    for i in range(5):
-        print("entropy sample: ", tree.calculate_entropy(X, y, i))
