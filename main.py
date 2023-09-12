@@ -100,30 +100,55 @@ class DecisionTree:
             
         return True
 
-    def calculate_entropy(self, x, i):
+    def calculate_entropy(self, x, y, col_index):
         """
         Return a single value for entropy from a column of interest from X
+        0 signifies white wine and 1 signifies red wine
         """
+
         # Get the column of interest from the table X
-        column = [row[i] for row in x]
+        column = [row[col_index] for row in x]
+        total_dataset_size = len(column)
         
-        # Count the frequency of each unique value in the data
-        values_dict = {}
-        for count in column:
-            if count in values_dict:
-                values_dict[count] += 1
+        # Choose the splitting threshold
+        split_threshold = np.median(column)
+
+        # Get counts for each subset
+        below_white, below_red, above_white, above_red = 0, 0, 0, 0
+
+        for i in range(len(column)):
+            feature = column[i]
+
+            if feature <= split_threshold:
+                if y[i] == 0:
+                    below_white += 1
+                else:
+                    below_red += 1
             else:
-                values_dict[count] = 1
+                if y[i] == 0:
+                    above_white += 1
+                else:
+                    above_red += 1
         
-        entropy = 0.0
-        total_count = len(column)
-        
-        # Iteratively calculate the entropy for a different of x and sum it.
-        for count in values_dict.values():
-            probability = count / total_count
-            if probability != 0:
-                entropy += probability * math.log2(probability)
-        return -entropy
+        # Calculate entropy for below subset
+        total_below = below_white + below_red
+        p_below_white = below_white / total_below
+        p_below_red = below_red / total_below
+        entropy_below = -p_below_white * np.log2(p_below_white) - p_below_red * np.log2(p_below_red)
+
+        # Calculate entropy for above subset
+        total_above = above_white + above_red
+        p_above_white = above_white / total_above
+        p_above_red = above_red / total_above
+        entropy_above = -p_above_white * np.log2(p_above_white) - p_above_red * np.log2(p_above_red)
+
+        # Calculate total weighted entropy
+        proportion_below = total_below / total_dataset_size
+        proportion_above = total_above / total_dataset_size
+
+        total_entropy = proportion_below * entropy_below + proportion_above * entropy_above
+        return total_entropy
+
 
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
@@ -141,11 +166,12 @@ class DecisionTree:
         optimal_info_gain, optimal_col_index = 0, 0
 
         for col_index in range(len(X[0])):
-            col_entropy = self.calculate_entropy(X, col_index)
+            col_entropy = 100000
+            # col_entropy = self.calculate_entropy(X, y, col_index)
             information_gain = total_entropy - col_entropy
 
-            print("col_entropy =", col_entropy)
-            print("information_gain =", information_gain)
+            # print("col_entropy =", col_entropy)
+            # print("information_gain =", information_gain)
 
             # Update optimal information gain and column index
             if information_gain > optimal_info_gain:
@@ -230,9 +256,11 @@ def read_data(filename):
 if __name__ == "__main__":
     print("INF264 Project 1")
     csv_file = "wine_dataset.csv"
-    # X, y = read_data(csv_file)
+    X, y = read_data(csv_file)
 
     tree = DecisionTree()
     calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
     print("calc_entropy_result =", calc_entropy_result)
-    print("entropy sample: ", tree.calculate_entropy(X, 0))
+
+    for i in range(5):
+        print("entropy sample: ", tree.calculate_entropy(X, y, i))
