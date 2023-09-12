@@ -40,19 +40,21 @@ class DecisionTree:
         
         # If all data points have the same label, return a leaf with that label
         if len(set(y)) == 1:
+            node.label = y[0]
             return node
 
         # Elif all data points have identical feature values, return a leaf with the most common label
         elif self.identical_features(x):
-            return self.most_common_label(y)
+            node.label = self.most_common_label(y)
+            return node
 
         # Else create decision tree
         # - Choose a feature with the most infomation gain
         # - Split the data based on the feature's value and add a branch for each subset of data
         # - For each branch, call the algorithm recursively on the data points for that specific branch
-        else:
-            pass
-
+        
+        
+        
     # TODO: finish function
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
@@ -205,6 +207,10 @@ class DecisionTree:
         validation_set = X_validation, y_validation
         return train_set, validation_set
 
+    # 1.3 - Pruning
+    def prune_tree(self, X, y, tree):
+        pass
+    
 # Other functions
 def read_data(filename):
     """
