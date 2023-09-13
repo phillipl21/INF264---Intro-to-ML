@@ -61,12 +61,13 @@ class DecisionTree:
         x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_column)
 
         # Run create_tree recursively right and left
-        # IF Condition
-            # node.left = Node()
-            # self.create_tree(x_1, y_1, node.left)
-        # ELSE IF Condition
-            # node.right = Node()
-            # self.create_tree(x_2, y_2, node.right)
+        if len(y_1) != 0: # If data set exists
+            node.left = Node()
+            self.create_tree(x_1, y_1, node.left)
+            
+        if len(y_2) != 0:
+            node.right = Node()
+            self.create_tree(x_2, y_2, node.right)
 
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
@@ -89,6 +90,8 @@ class DecisionTree:
         # Prune the tree if needed
         if prune:
             self.prune_tree(X_test, y_test, self.root)
+            
+        return self
 
     # TODO: finish function
     def predict(self, x):
