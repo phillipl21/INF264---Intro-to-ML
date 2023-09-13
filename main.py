@@ -32,14 +32,16 @@ class Node:
 
 class DecisionTree:
     def __init__(self):
-        self.root = Node(None, None)
+        self.root = Node()
         self.X, self.y = read_data("wine_dataset.csv")
+        self.feature_cols = self.generate_feature_cols(self.X)
 
     # TODO: finish function
     def create_tree(self, x, y, node):
         """
         Create a decision tree based on input data
-        
+        Modifies the node passed in directly
+
         Parameters:
         x and y: a list of data representing input and output
         node: the starting node of the tree (can be a subset of another tree)
@@ -48,13 +50,17 @@ class DecisionTree:
         
         # If all data points have the same label, return a leaf with that label
         if len(set(y)) == 1:
-            node.label = y[0]
-            return node
+            node.class_label = y[0]
+            node.left = None
+            node.right = None
+            return
 
         # Elif all data points have identical feature values, return a leaf with the most common label
         elif self.identical_features(x):
-            node.label = self.most_common_label(y)
-            return node
+            node.class_label = self.most_common_label(y)
+            node.left = None
+            node.right = None
+            return
 
         # Else create decision tree
         # - Choose a feature with the most infomation gain
@@ -65,8 +71,13 @@ class DecisionTree:
         # Split data in 2 - split either using Gini Index or Entropy based on 
         # chosen parameter. Will likely require helper function to figure
         # out the best way to split.
-        optimal_column = self.calculate_optimal_tree_split(X, y)
-        x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_column)
+        optimal_col_index = self.calculate_optimal_tree_split(X, y)
+        x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_col_index)
+
+        # Set feature to split on and its threshold
+        node.feature_index = optimal_col_index
+        feature_col = self.feature_cols[optimal_col_index]
+        node.split_threshold = np.median(feature_col)
 
         # Run create_tree recursively right and left
         if len(y_1) != 0: # If data set exists
@@ -124,6 +135,7 @@ class DecisionTree:
         a data point x. Called recursively
         """
         pass
+
     # Helper methods
     # TODO: finish function
     def identical_features(self, X):
@@ -137,7 +149,7 @@ class DecisionTree:
         # Get horizontal length of 2D array
         for i in range(len(X[0])):
             # Iterate through the columns of the array
-            column = [row[i] for row in X]
+            column = self.feature_cols[i]
             # Check for value uniqueness by comparing with the first value 
             for val in column:
                 if val is not column[0]:
@@ -154,7 +166,7 @@ class DecisionTree:
         x_above, y_above = [], []
         
         # Get split_threshold
-        column_values = [row[feature_index] for row in X]
+        column_values = self.feature_cols[feature_index]
         split_threshold = np.median(column_values)
         
         # Divide features and corresponding labels into two sets
@@ -186,7 +198,7 @@ class DecisionTree:
         0 signifies white wine and 1 signifies red wine
         """
         # Get the column of interest from the table X
-        column = [row[col_index] for row in x]
+        column = self.feature_cols[col_index]
         total_dataset_size = len(column)
         
         # Choose the splitting threshold
@@ -261,9 +273,8 @@ class DecisionTree:
         Gini Index is another impurity measurement. Will be similar to entropy 
         calculation function.
         """
-        
         # Get the column of interest from the table X
-        column = [row[col_index] for row in x]
+        column = self.feature_cols[col_index]
         total_dataset_size = len(column)
         
         # Choose the splitting threshold
@@ -370,7 +381,26 @@ class DecisionTree:
     # TODO: finish
     def prune_tree(self, X, y, tree):
         pass
-    
+
+    def generate_feature_cols(self, X):
+        """
+        Returns a hash map of all of the feature columns as lists
+
+        Ex. {
+            0: [f1, f2, ..., fn],
+            1: [g1, g2, ..., gn],
+            ...
+            n: [h1, h2, ..., hn]
+        }
+        Key: feature index
+        Value: feature column as a list
+        """
+        hashmap = {}
+        for i in range(len(X)):
+            hashmap[i] = [row[i] for row in X]
+
+        return hashmap
+
 # Other functions
 def read_data(filename):
     """
