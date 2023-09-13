@@ -12,10 +12,18 @@ from sklearn.model_selection import train_test_split
 
 # Classes
 class Node:
-    def __init__(self, label, data, left=None, right=None):
-        self.data = data
-        self.split_threshold = None
-        self.leaf_class_label = None
+    def __init__(self, feature_index=None, split_threshold=None, class_label=None, left=None, right=None):
+        """
+        Parameters:
+         - feature_index: int specifying which feature to split on
+         - split_threshold: float specifying where to split
+         - class_label: int specifying the result (0 for white, 1 for red). Only stored for leaf nodes
+         - left: left node child
+         - right: right node child
+        """
+        self.feature_index = feature_index
+        self.split_threshold = split_threshold
+        self.class_label = class_label
         self.left = left
         self.right = right
 
