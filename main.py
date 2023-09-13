@@ -14,10 +14,10 @@ from sklearn.model_selection import train_test_split
 class Node:
     def __init__(self, label, data, left=None, right=None):
         self.data = data
-        self.label = label
+        self.split_threshold = None
+        self.leaf_class_label = None
         self.left = left
         self.right = right
-        pass
 
     def is_leaf(self):
         return self.right == None and self.left == None
@@ -127,25 +127,28 @@ class DecisionTree:
             
         return True
     
-    def split_data(self, X, y, optimal_column):
+    def split_data(self, X, y, feature_index):
+        """
+        Split the data into two sections based off the feature_index
+        """
         # Create lists for splitting the data into 2 parts
         x_1, y_1 = [], []
         x_2, y_2 = [], []
         
         # Get split_threshold
-        column_values = [row[optimal_column] for row in X]
-        split_threshold = np.median(optimal_column)
+        column_values = [row[feature_index] for row in X]
+        split_threshold = np.median(column_values)
         
         # Divide features and corresponding labels into two sets
-        for i, row in enumerate(X):
-            feature = row[optimal_column]
-            
+        for row in X:
+            feature = row[feature_index]
+
             if feature > split_threshold:
                 x_1.append(row)
-                y_1.append(y[optimal_column])
+                y_1.append(y[feature_index])
             elif feature <= split_threshold:
                 x_2.append(row)
-                y_2.append(y[optimal_column])
+                y_2.append(y[feature_index])
         
         return x_1, y_1, x_2, y_2
 
