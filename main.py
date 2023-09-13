@@ -128,13 +128,6 @@ class DecisionTree:
             return tree.label
         
         pass
-    
-    def traverse(self, x, node):
-        """
-        Traverses tree. Used by predict to find the optimal place for
-        a data point x. Called recursively
-        """
-        pass
 
     # Helper methods
     # TODO: finish function
@@ -156,7 +149,7 @@ class DecisionTree:
                     return False
 
         return True
-    
+
     def split_data(self, X, y, feature_index):
         """
         Split the data into two sections based off the feature_index
@@ -189,8 +182,6 @@ class DecisionTree:
             return self.calculate_optimal_entropy_split(X, y)
         else:
             print("Error in calculate_optimal_tree_split() - invalid impurity measure")
-            
-        return
         
     def calculate_entropy(self, x, y, col_index):
         """
