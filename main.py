@@ -28,7 +28,7 @@ class Node:
         self.right = right
 
     def is_leaf(self):
-        return self.right == None and self.left == None
+        return not self.left and not self.right
 
 class DecisionTree:
     def __init__(self):
@@ -344,6 +344,27 @@ class DecisionTree:
             print(f"Depth: {node.depth} Data: {node.data}")
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
+
+    def traverse(self, x, node):
+        """
+        Traverse the tree starting at the specified node
+
+        Parameters:
+         - x: an input data point represented as a row of feature values
+         - node: the starting node of the tree or subtree
+
+        Return value: a int representing the leaf node class label
+        """
+        # Return label if the node is a leaf
+        if node.is_leaf() == True:
+            return node.class_label
+
+        x_feature = x[feature_index]
+
+        if x_feature <= split_threshold:
+            return self.traverse(x, node.left)
+        else:
+            return self.traverse(x, node.right)
 
     # 1.3 - Pruning
     # TODO: finish
