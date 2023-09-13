@@ -104,8 +104,18 @@ class DecisionTree:
         Return value:
         - class_label
         """
+        tree = self.tree
+        if tree.is_leaf():
+            return tree.label
+        
         pass
-
+    
+    def traverse(self, x, node):
+        """
+        Traverses tree. Used by predict to find the optimal place for
+        a data point x. Called recursively
+        """
+        pass
     # Helper methods
     # TODO: finish function
     def identical_features(self, X):
@@ -291,6 +301,7 @@ class DecisionTree:
         
         return gini_total
     
+    # TODO: finish function!
     def calculate_optimal_gini_index_split(self, X, y):
         """
         Return best feature and index to split at
