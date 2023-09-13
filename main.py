@@ -125,9 +125,7 @@ class DecisionTree:
         """
         tree = self.tree
         if tree.is_leaf():
-            return tree.label
-        
-        pass
+            return tree.class_label
 
     # Helper methods
     # TODO: finish function
@@ -138,7 +136,7 @@ class DecisionTree:
         if X is None or X[0] is None: # Null array
             print("identical_features() - No values found in array.")
             return False
-        
+
         # Get horizontal length of 2D array
         for i in range(len(X[0])):
             # Iterate through the columns of the array
@@ -174,7 +172,7 @@ class DecisionTree:
                 y_above.append(y[i])
 
         return x_below, y_below, x_above, y_above
-    
+
     def calculate_optimal_tree_split(self, X, y):
         if self.impurity_measure == 'gini':
             return self.calculate_optimal_gini_index_split(X, y)
@@ -182,16 +180,16 @@ class DecisionTree:
             return self.calculate_optimal_entropy_split(X, y)
         else:
             print("Error in calculate_optimal_tree_split() - invalid impurity measure")
-        
-    def calculate_entropy(self, x, y, col_index):
+
+    def calculate_entropy(self, col_index):
         """
         Return a single value for entropy from a column of interest from X
         0 signifies white wine and 1 signifies red wine
         """
         # Get the column of interest from the table X
-        column = self.feature_cols[col_index]
+        column = np.array(self.feature_cols[col_index])
         total_dataset_size = len(column)
-        
+
         # Choose the splitting threshold
         split_threshold = np.median(column)
 
@@ -202,26 +200,26 @@ class DecisionTree:
             feature = column[i]
 
             if feature <= split_threshold:
-                if y[i] == 0:
+                if self.y[i] == 0:
                     below_white += 1
                 else:
                     below_red += 1
             else:
-                if y[i] == 0:
+                if self.y[i] == 0:
                     above_white += 1
                 else:
                     above_red += 1
         
         # Calculate entropy for below subset
         total_below = below_white + below_red
-        p_below_white = below_white / total_below if total_below != 0 else 0
-        p_below_red = below_red / total_below if total_below != 0 else 0
+        p_below_white = below_white / total_below
+        p_below_red = below_red / total_below
         entropy_below = -p_below_white * np.log2(p_below_white) - p_below_red * np.log2(p_below_red)
 
         # Calculate entropy for above subset
         total_above = above_white + above_red
-        p_above_white = above_white / total_above if total_above != 0 else 0
-        p_above_red = above_red / total_above if total_above != 0 else 0
+        p_above_white = above_white / total_above
+        p_above_red = above_red / total_above
         entropy_above = -p_above_white * np.log2(p_above_white) - p_above_red * np.log2(p_above_red)
 
         # Calculate total weighted entropy
@@ -230,7 +228,7 @@ class DecisionTree:
 
         total_entropy = proportion_below * entropy_below + proportion_above * entropy_above
         return total_entropy
-        
+
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
