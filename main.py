@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import random
 import math
 
-from csv import reader
+from sklearn.model_selection import train_test_split
 
 # Classes
 class Node:
@@ -59,7 +59,7 @@ class DecisionTree:
         # out the best way to split.
         optimal_column = self.calculate_optimal_tree_split(X, y)
         x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_column)
-        
+
         # Run create_tree recursively right and left
         # IF Condition
             # node.left = Node()
@@ -67,9 +67,7 @@ class DecisionTree:
         # ELSE IF Condition
             # node.right = Node()
             # self.create_tree(x_2, y_2, node.right)
-        
-        
-    # TODO: finish function
+
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
         Create a decision tree based on input data and an impurity measure
@@ -81,8 +79,16 @@ class DecisionTree:
         """
         # Store this for later functions in the class
         self.impurity_measure = impurity_measure
-        
-        pass
+
+        # Split data into training and validation sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
+
+        # Create the decision tree
+        self.create_tree(X_train, y_train, self.root)
+
+        # Prune the tree if needed
+        if prune:
+            self.prune_tree(X_test, y_test, self.root)
 
     # TODO: finish function
     def predict(self, x):
@@ -139,7 +145,6 @@ class DecisionTree:
                 y_2.append(y[optimal_column])
         
         return x_1, y_1, x_2, y_2
-        
 
     def calculate_entropy(self, x, y, col_index):
         """
@@ -215,8 +220,6 @@ class DecisionTree:
         for col_index in range(len(X[0])):
             col_entropy = self.calculate_entropy(X, y, col_index)
             information_gain = total_entropy - col_entropy
-
-            print(f"col_entropy = {col_entropy}, information_gain = {information_gain}")
 
             # Update optimal information gain and column index
             if information_gain > optimal_info_gain:
@@ -297,5 +300,7 @@ if __name__ == "__main__":
     X, y = read_data(csv_file)
 
     tree = DecisionTree()
+    tree.learn(X, y, impurity_measure='entropy', prune='False')
+
     calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
     print("calc_entropy_result =", calc_entropy_result)
