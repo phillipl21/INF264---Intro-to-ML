@@ -132,25 +132,25 @@ class DecisionTree:
         Split the data into two sections based off the feature_index
         """
         # Create lists for splitting the data into 2 parts
-        x_1, y_1 = [], []
-        x_2, y_2 = [], []
+        x_below, y_below = [], []
+        x_above, y_above = [], []
         
         # Get split_threshold
         column_values = [row[feature_index] for row in X]
         split_threshold = np.median(column_values)
         
         # Divide features and corresponding labels into two sets
-        for row in X:
+        for i, row in enumerate(X):
             feature = row[feature_index]
 
-            if feature > split_threshold:
-                x_1.append(row)
-                y_1.append(y[feature_index])
-            elif feature <= split_threshold:
-                x_2.append(row)
-                y_2.append(y[feature_index])
-        
-        return x_1, y_1, x_2, y_2
+            if feature <= split_threshold:
+                x_below.append(row)
+                y_below.append(y[i])
+            else:
+                x_above.append(row)
+                y_above.append(y[i])
+
+        return x_below, y_below, x_above, y_above
         
     def calculate_entropy(self, x, y, col_index):
         """
@@ -207,9 +207,7 @@ class DecisionTree:
             pass # TODO: add calculate_optimal_gini_split(x,y)
         elif self.impurity_measure == 'entropy':
             return self.calculate_optimal_entropy_split(X, y)
-        
-    # TODO: figure out calculate_entropy function
-    # TODO: determine how to split data based off information gain
+
     def calculate_optimal_entropy_split(self, X, y):
         """
         Return the best feature to split at and what value to split at
@@ -360,7 +358,8 @@ if __name__ == "__main__":
     X, y = read_data(csv_file)
 
     tree = DecisionTree()
-    tree.learn(X, y, impurity_measure='entropy', prune='False')
+    # tree.learn(X, y, impurity_measure='entropy', prune='False')
+    tree.split_data(X, y, 0)
 
     calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
     print("calc_entropy_result =", calc_entropy_result)
