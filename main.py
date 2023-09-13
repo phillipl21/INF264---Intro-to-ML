@@ -90,7 +90,7 @@ class DecisionTree:
         # Prune the tree if needed
         if prune:
             self.prune_tree(X_test, y_test, self.root)
-            
+
         return self
 
     # TODO: finish function
@@ -124,7 +124,7 @@ class DecisionTree:
             for val in column:
                 if val is not column[0]:
                     return False
-            
+
         return True
     
     def split_data(self, X, y, feature_index):
@@ -316,17 +316,8 @@ class DecisionTree:
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
 
-    # TODO: replace with train_test_split from scikit learn
-    # def train_validation_split(self, X, y, pct_validation):
-    #     """
-    #     Split X and y into train and validation sets. 
-    #     pct_validation determines how much of the data should be validation set
-
-    #     Return the train set as the first two values
-    #     and the validation set as the last two values
-    #     """
-
     # 1.3 - Pruning
+    # TODO: finish
     def prune_tree(self, X, y, tree):
         pass
     
