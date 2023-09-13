@@ -10,6 +10,12 @@ import math
 
 from sklearn.model_selection import train_test_split
 
+
+# TODO:
+# - refactor code to reference self.X and self.y
+# - implement prune function
+# - test the code
+
 # Classes
 class Node:
     def __init__(self, feature_index=None, split_threshold=None, class_label=None, left=None, right=None):
