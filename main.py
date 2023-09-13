@@ -112,8 +112,18 @@ class DecisionTree:
         Return value:
         - class_label
         """
+        tree = self.tree
+        if tree.is_leaf():
+            return tree.label
+        
         pass
-
+    
+    def traverse(self, x, node):
+        """
+        Traverses tree. Used by predict to find the optimal place for
+        a data point x. Called recursively
+        """
+        pass
     # Helper methods
     # TODO: finish function
     def identical_features(self, X):
@@ -159,13 +169,22 @@ class DecisionTree:
                 y_above.append(y[i])
 
         return x_below, y_below, x_above, y_above
+    
+    def calculate_optimal_tree_split(self, X, y):
+        if self.impurity_measure == 'gini':
+            return self.calculate_optimal_gini_index_split(X, y)
+        elif self.impurity_measure == 'entropy':
+            return self.calculate_optimal_entropy_split(X, y)
+        else:
+            print("Error in calculate_optimal_tree_split() - invalid impurity measure")
+            
+        return
         
     def calculate_entropy(self, x, y, col_index):
         """
         Return a single value for entropy from a column of interest from X
         0 signifies white wine and 1 signifies red wine
         """
-
         # Get the column of interest from the table X
         column = [row[col_index] for row in x]
         total_dataset_size = len(column)
@@ -208,14 +227,9 @@ class DecisionTree:
 
         total_entropy = proportion_below * entropy_below + proportion_above * entropy_above
         return total_entropy
-    
-    # TODO: add option for both Gini and Entropy based on earlier paraameters
-    def calculate_optimal_tree_split(self, X, y):
-        if self.impurity_measure == 'gini':
-            pass # TODO: add calculate_optimal_gini_split(x,y)
-        elif self.impurity_measure == 'entropy':
-            return self.calculate_optimal_entropy_split(X, y)
-
+        
+    # TODO: figure out calculate_entropy function
+    # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
         """
         Return the best feature to split at and what value to split at
@@ -294,6 +308,13 @@ class DecisionTree:
         gini_total = gini_below * proportion_below + gini_above * proportion_above
         
         return gini_total
+    
+    # TODO: finish function!
+    def calculate_optimal_gini_index_split(self, X, y):
+        """
+        Return best feature and index to split at
+        """
+        pass
         
     def most_common_label(self, y):
         """
