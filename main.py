@@ -151,7 +151,7 @@ class DecisionTree:
                 y_2.append(y[feature_index])
         
         return x_1, y_1, x_2, y_2
-
+        
     def calculate_entropy(self, x, y, col_index):
         """
         Return a single value for entropy from a column of interest from X
@@ -204,7 +204,7 @@ class DecisionTree:
     # TODO: add option for both Gini and Entropy based on earlier paraameters
     def calculate_optimal_tree_split(self, X, y):
         if self.impurity_measure == 'gini':
-            pass
+            pass # TODO: add calculate_optimal_gini_split(x,y)
         elif self.impurity_measure == 'entropy':
             return self.calculate_optimal_entropy_split(X, y)
         
@@ -235,6 +235,60 @@ class DecisionTree:
         # Return feature with the best information gain
         return optimal_col_index
 
+    def calculate_gini_index(self, x, y, col_index):
+        """
+        Return a single value for Gini index from a column of interest from X.
+        Gini Index is another impurity measurement. Will be similar to entropy 
+        calculation function.
+        """
+        
+        # Get the column of interest from the table X
+        column = [row[col_index] for row in x]
+        total_dataset_size = len(column)
+        
+        # Choose the splitting threshold
+        split_threshold = np.median(column)
+
+        # Get counts for each subset
+        below_white, below_red, above_white, above_red = 0, 0, 0, 0
+        
+        for i in range(len(column)):
+            feature = column[i]
+
+            if feature <= split_threshold:
+                if y[i] == 0:
+                    below_white += 1
+                else:
+                    below_red += 1
+            else:
+                if y[i] == 0:
+                    above_white += 1
+                else:
+                    above_red += 1
+                    
+        # Have the data in 2 classes now. Time to calculate the Ginig index
+        # for each and weigh it
+        
+        # Calculate probabilities and gini for the belows
+        total_below = below_white + below_red
+        p_below_white = below_white / total_below if total_below != 0 else 0
+        p_below_red = below_red / total_below if total_below != 0 else 0
+        gini_below = 1 - (math.pow(p_below_red / total_below, 2) + math.pow(p_below_white / total_below, 2))
+        
+        # Calculate probabilities and gini for aboves
+        total_above = above_white + above_red
+        p_above_white = above_white / total_above if total_above != 0 else 0
+        p_above_red = above_red / total_above if total_above != 0 else 0
+        gini_above = 1 - (math.pow(p_above_red / total_above, 2) + math.pow(p_above_white / total_above, 2))
+        
+        # Calculate total weighted gini index
+        proportion_below = total_below / total_dataset_size
+        proportion_above = total_above / total_dataset_size
+        
+        gini_total = gini_below * proportion_below + gini_above * proportion_above
+        
+        return gini_total
+        
     def most_common_label(self, y):
         """
         Return 0 or 1 depending on whichever is the most common label
