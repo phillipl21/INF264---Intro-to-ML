@@ -219,7 +219,6 @@ class DecisionTree:
         # Get the column of interest from the table X
         column = np.array(self.feature_cols[col_index])
         total_dataset_size = len(column)
-
         df = pd.DataFrame({'feature': column, 'label': y})
 
         # Choose the splitting threshold
@@ -229,7 +228,7 @@ class DecisionTree:
         weighted_below_entropy = self.weighted_subset_entropy(df, split_threshold, total_dataset_size, 'below')
         weighted_above_entropy = self.weighted_subset_entropy(df, split_threshold, total_dataset_size, 'above')
 
-        return weighted_below_entropy + weighted_below_entropy
+        return weighted_below_entropy + weighted_above_entropy
 
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
