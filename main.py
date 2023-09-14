@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 # TODO:
 # - refactor code to reference self.X and self.y
 # - implement prune function
+# - finish implementing gini index
 # - test the code
 
 # Classes
