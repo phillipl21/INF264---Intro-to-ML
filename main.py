@@ -187,7 +187,31 @@ class DecisionTree:
         else:
             print("Error in calculate_optimal_tree_split() - invalid impurity measure")
 
-    def calculate_entropy(self, col_index):
+    def weighted_subset_entropy(self, df, split_threshold, dataset_size, which_half):
+        """
+        Return the weighted subset entropy of either the upper or lower half of the dataset
+        Returns -1 on error
+        """
+        if which_half == 'below':
+            subset = df[df['feature'] <= split_threshold]
+
+        elif which_half == 'above':
+            subset = df[df['feature'] > split_threshold]
+        
+        else:
+            print("Error in calc_subset_entropy: invalid which_half value")
+            return -1
+        
+        subset_counts = subset['label'].value_counts()
+        subset_size = len(subset)
+
+        class_proportions = subset_counts / subset_size
+        unweighted_entropy = -(class_proportions * np.log2(class_proportions)).sum()
+        subset_proportion = subset_size / dataset_size
+
+        return subset_proportion * unweighted_entropy
+
+    def calc_entropy(self, col_index):
         """
         Return a single value for entropy from a column of interest from X
         0 signifies white wine and 1 signifies red wine
@@ -196,44 +220,16 @@ class DecisionTree:
         column = np.array(self.feature_cols[col_index])
         total_dataset_size = len(column)
 
+        df = pd.DataFrame({'feature': column, 'label': y})
+
         # Choose the splitting threshold
         split_threshold = np.median(column)
 
-        # Get counts for each subset
-        below_white, below_red, above_white, above_red = 0, 0, 0, 0
+        # Get entropy for each subset
+        weighted_below_entropy = self.weighted_subset_entropy(df, split_threshold, total_dataset_size, 'below')
+        weighted_above_entropy = self.weighted_subset_entropy(df, split_threshold, total_dataset_size, 'above')
 
-        for i in range(len(column)):
-            feature = column[i]
-
-            if feature <= split_threshold:
-                if self.y[i] == 0:
-                    below_white += 1
-                else:
-                    below_red += 1
-            else:
-                if self.y[i] == 0:
-                    above_white += 1
-                else:
-                    above_red += 1
-        
-        # Calculate entropy for below subset
-        total_below = below_white + below_red
-        p_below_white = below_white / total_below
-        p_below_red = below_red / total_below
-        entropy_below = -p_below_white * np.log2(p_below_white) - p_below_red * np.log2(p_below_red)
-
-        # Calculate entropy for above subset
-        total_above = above_white + above_red
-        p_above_white = above_white / total_above
-        p_above_red = above_red / total_above
-        entropy_above = -p_above_white * np.log2(p_above_white) - p_above_red * np.log2(p_above_red)
-
-        # Calculate total weighted entropy
-        proportion_below = total_below / total_dataset_size
-        proportion_above = total_above / total_dataset_size
-
-        total_entropy = proportion_below * entropy_below + proportion_above * entropy_above
-        return total_entropy
+        return weighted_below_entropy + weighted_below_entropy
 
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
@@ -251,7 +247,7 @@ class DecisionTree:
         optimal_info_gain, optimal_col_index = 0, 0
 
         for col_index in range(len(X[0])):
-            col_entropy = self.calculate_entropy(X, y, col_index)
+            col_entropy = self.calc_entropy(col_index)
             information_gain = total_entropy - col_entropy
 
             # Update optimal information gain and column index
@@ -391,7 +387,7 @@ class DecisionTree:
         Value: feature column as a list
         """
         hashmap = {}
-        for i in range(len(X)):
+        for i in range(len(X[0])):
             hashmap[i] = [row[i] for row in X]
 
         return hashmap
