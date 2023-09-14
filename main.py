@@ -129,9 +129,8 @@ class DecisionTree:
         Return value:
         - class_label
         """
-        tree = self.tree
-        if tree.is_leaf():
-            return tree.class_label
+        # Basically just a wrapper for traverse
+        return self.traverse(x, self.tree)
 
     # Helper methods
     # TODO: finish function
