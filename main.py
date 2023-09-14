@@ -196,6 +196,7 @@ class DecisionTree:
             print("Error in weighted_subset_entropy: dataset_size is 0")
             return -1
 
+        # Create subset
         if which_half == 'below':
             subset = df[df['feature'] <= split_threshold]
 
@@ -206,6 +207,7 @@ class DecisionTree:
             print("Error in weighted_subset_entropy: invalid which_half value")
             return -1
 
+        # Calculate weighted entropy value
         subset_counts = subset['label'].value_counts()
         class_proportions = subset_counts / len(subset)
         unweighted_entropy = -(class_proportions * np.log2(class_proportions)).sum()
@@ -265,6 +267,7 @@ class DecisionTree:
             print("Error in weighted_subset_gini: dataset_size is 0")
             return -1
 
+        # Create subset
         if which_half == 'below':
             subset = df[df['feature'] <= split_threshold]
 
@@ -275,6 +278,7 @@ class DecisionTree:
             print("Error in weighted_subset_gini: invalid which_half value")
             return -1
 
+        # Calculate weighted gini value
         subset_counts = subset['label'].value_counts()
         class_proportions = subset_counts / len(subset)
         subset_weight = len(subset) / dataset_size
