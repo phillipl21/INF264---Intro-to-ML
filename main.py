@@ -193,6 +193,7 @@ class DecisionTree:
         Returns -1 on error
         """
         if dataset_size == 0:
+            print("Error in weighted_subset_entropy: dataset_size is 0")
             return -1
 
         if which_half == 'below':
@@ -202,7 +203,7 @@ class DecisionTree:
             subset = df[df['feature'] > split_threshold]
         
         else:
-            print("Error in calc_subset_entropy: invalid which_half value")
+            print("Error in weighted_subset_entropy: invalid which_half value")
             return -1
 
         subset_counts = subset['label'].value_counts()
@@ -231,8 +232,6 @@ class DecisionTree:
 
         return weighted_below_entropy + weighted_above_entropy
 
-    # TODO: figure out calculate_entropy function
-    # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
         """
         Return the best feature to split at and what value to split at
@@ -259,8 +258,29 @@ class DecisionTree:
 
     def weighted_subset_gini(self, df, split_threshold, dataset_size, which_half):
         """
-        Returns the weight 
+        Returns the weighted gini index for a given subset
+        Returns -1 on error
         """
+        if dataset_size == 0:
+            print("Error in weighted_subset_gini: dataset_size is 0")
+            return -1
+
+        if which_half == 'below':
+            subset = df[df['feature'] <= split_threshold]
+
+        elif which_half == 'above':
+            subset = df[df['feature'] > split_threshold]
+
+        else:
+            print("Error in weighted_subset_gini: invalid which_half value")
+            return -1
+
+        subset_counts = subset['label'].value_counts()
+        class_proportions = subset_counts / len(subset)
+        subset_weight = len(subset) / dataset_size
+        unweighted_gini = 1 - (class_proportions**2).sum()
+
+        return subset_weight * unweighted_gini
 
     def calculate_gini_index(self, x, y, col_index):
         """
@@ -269,50 +289,17 @@ class DecisionTree:
         calculation function.
         """
         # Get the column of interest from the table X
-        column = self.feature_cols[col_index]
+        column = np.array(self.feature_cols[col_index])
         total_dataset_size = len(column)
-        
+        df = pd.DataFrame({'feature': column, 'label': y})
+
         # Choose the splitting threshold
         split_threshold = np.median(column)
 
-        # Get counts for each subset
-        below_white, below_red, above_white, above_red = 0, 0, 0, 0
-        
-        for i in range(len(column)):
-            feature = column[i]
+        weighted_below_gini = self.weighted_subset_gini(df, split_threshold, total_dataset_size, 'below')
+        weighted_above_gini = self.weighted_subset_gini(df, split_threshold, total_dataset_size, 'above')
 
-            if feature <= split_threshold:
-                if y[i] == 0:
-                    below_white += 1
-                else:
-                    below_red += 1
-            else:
-                if y[i] == 0:
-                    above_white += 1
-                else:
-                    above_red += 1
-                    
-        # Have the data in 2 classes now. Time to calculate the Ginig index
-        # for each and weigh it
-
-        # Calculate probabilities and gini for the belows
-        total_below = below_white + below_red
-        p_below_white = below_white / total_below if total_below != 0 else 0
-        p_below_red = below_red / total_below if total_below != 0 else 0
-        gini_below = 1 - (math.pow(p_below_red / total_below, 2) + math.pow(p_below_white / total_below, 2))
-        
-        # Calculate probabilities and gini for aboves
-        total_above = above_white + above_red
-        p_above_white = above_white / total_above if total_above != 0 else 0
-        p_above_red = above_red / total_above if total_above != 0 else 0
-        gini_above = 1 - (math.pow(p_above_red / total_above, 2) + math.pow(p_above_white / total_above, 2))
-        
-        # Calculate total weighted gini index
-        proportion_below = total_below / total_dataset_size
-        proportion_above = total_above / total_dataset_size
-        
-        gini_total = gini_below * proportion_below + gini_above * proportion_above
-        return gini_total
+        return weighted_below_gini + weighted_above_gini
     
     # TODO: finish function!
     def calculate_optimal_gini_index_split(self, X, y):
@@ -426,5 +413,7 @@ if __name__ == "__main__":
     # tree.learn(X, y, impurity_measure='entropy', prune='False')
     tree.split_data(X, y, 0)
 
-    calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
-    print("calc_entropy_result =", calc_entropy_result)
+    # calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
+    # print("calc_entropy_result =", calc_entropy_result)
+
+    tree.calculate_gini_index(X, y, 0)
