@@ -115,7 +115,7 @@ class DecisionTree:
 
         # Prune the tree if needed
         if prune:
-            self.prune_tree(X_test, y_test, self.root)
+            self.prune(X_test, y_test, self.root)
 
         return self
 
