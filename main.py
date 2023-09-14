@@ -12,9 +12,9 @@ from sklearn.model_selection import train_test_split
 
 
 # TODO:
-# - refactor code to reference self.X and self.y
 # - implement prune function
 # - finish implementing gini index
+# - do we need to return split_threshold from calculate_optimal_entropy_split?
 # - test the code
 
 # Classes
@@ -163,7 +163,7 @@ class DecisionTree:
         x_above, y_above = [], []
         
         # Get split_threshold
-        column_values = self.feature_cols[feature_index]
+        column_values = [row[feature_index] for row in X]
         split_threshold = np.median(column_values)
         
         # Divide features and corresponding labels into two sets
@@ -215,22 +215,22 @@ class DecisionTree:
 
         return subset_weight * unweighted_entropy
 
-    def calc_entropy(self, col_index):
+    def calc_entropy(self, X, y, feature_index):
         """
         Return a single value for entropy from a column of interest from X
         0 signifies white wine and 1 signifies red wine
         """
         # Get the column of interest from the table X
-        column = np.array(self.feature_cols[col_index])
-        total_dataset_size = len(column)
+        column = np.array([row[feature_index] for row in X])
+        dataset_size = len(column)
         df = pd.DataFrame({'feature': column, 'label': y})
 
         # Choose the splitting threshold
         split_threshold = np.median(column)
 
         # Get entropy for each subset
-        weighted_below_entropy = self.weighted_subset_entropy(df, split_threshold, total_dataset_size, 'below')
-        weighted_above_entropy = self.weighted_subset_entropy(df, split_threshold, total_dataset_size, 'above')
+        weighted_below_entropy = self.weighted_subset_entropy(df, split_threshold, dataset_size, 'below')
+        weighted_above_entropy = self.weighted_subset_entropy(df, split_threshold, dataset_size, 'above')
 
         return weighted_below_entropy + weighted_above_entropy
 
@@ -288,22 +288,22 @@ class DecisionTree:
 
         return subset_weight * unweighted_gini
 
-    def calculate_gini_index(self, x, y, col_index):
+    def calculate_gini_index(self, X, y, feature_index):
         """
         Return a single value for Gini index from a column of interest from X.
         Gini Index is another impurity measurement. Will be similar to entropy 
         calculation function.
         """
         # Get the column of interest from the table X
-        column = np.array(self.feature_cols[col_index])
-        total_dataset_size = len(column)
+        column = np.array([row[feature_index] for row in X])
+        dataset_size = len(column)
         df = pd.DataFrame({'feature': column, 'label': y})
 
         # Choose the splitting threshold
         split_threshold = np.median(column)
 
-        weighted_below_gini = self.weighted_subset_gini(df, split_threshold, total_dataset_size, 'below')
-        weighted_above_gini = self.weighted_subset_gini(df, split_threshold, total_dataset_size, 'above')
+        weighted_below_gini = self.weighted_subset_gini(df, split_threshold, dataset_size, 'below')
+        weighted_above_gini = self.weighted_subset_gini(df, split_threshold, dataset_size, 'above')
 
         return weighted_below_gini + weighted_above_gini
     
