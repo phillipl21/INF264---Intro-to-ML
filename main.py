@@ -193,7 +193,7 @@ class DecisionTree:
         Returns -1 on error
         """
         if dataset_size == 0:
-            return 0
+            return -1
 
         if which_half == 'below':
             subset = df[df['feature'] <= split_threshold]
@@ -256,6 +256,11 @@ class DecisionTree:
 
         # Return feature with the best information gain
         return optimal_col_index
+
+    def weighted_subset_gini(self, df, split_threshold, dataset_size, which_half):
+        """
+        Returns the weight 
+        """
 
     def calculate_gini_index(self, x, y, col_index):
         """
@@ -359,7 +364,7 @@ class DecisionTree:
         if node.is_leaf() == True:
             return node.class_label
 
-        x_feature = x[feature_index]
+        x_feature = x[node.feature_index]
 
         if x_feature <= split_threshold:
             return self.traverse(x, node.left)
