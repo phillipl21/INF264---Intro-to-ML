@@ -366,7 +366,7 @@ class DecisionTree:
 
         x_feature = x[node.feature_index]
 
-        if x_feature <= split_threshold:
+        if x_feature <= node.split_threshold:
             return self.traverse(x, node.left)
         else:
             return self.traverse(x, node.right)
