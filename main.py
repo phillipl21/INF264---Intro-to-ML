@@ -192,6 +192,9 @@ class DecisionTree:
         Return the weighted subset entropy of either the upper or lower half of the dataset
         Returns -1 on error
         """
+        if dataset_size == 0:
+            return 0
+
         if which_half == 'below':
             subset = df[df['feature'] <= split_threshold]
 
@@ -201,15 +204,13 @@ class DecisionTree:
         else:
             print("Error in calc_subset_entropy: invalid which_half value")
             return -1
-        
+
         subset_counts = subset['label'].value_counts()
-        subset_size = len(subset)
-
-        class_proportions = subset_counts / subset_size
+        class_proportions = subset_counts / len(subset)
         unweighted_entropy = -(class_proportions * np.log2(class_proportions)).sum()
-        subset_proportion = subset_size / dataset_size
+        subset_weight = len(subset) / dataset_size
 
-        return subset_proportion * unweighted_entropy
+        return subset_weight * unweighted_entropy
 
     def calc_entropy(self, col_index):
         """
@@ -239,7 +240,6 @@ class DecisionTree:
         # Get total entropy for y
         proportion_white = y.count(0) / len(y)
         proportion_red = y.count(1) / len(y)
-
         total_entropy = -proportion_white * np.log2(proportion_white) - proportion_red * np.log2(proportion_red)
 
         # Calculate information gain for each feature
@@ -289,7 +289,7 @@ class DecisionTree:
                     
         # Have the data in 2 classes now. Time to calculate the Ginig index
         # for each and weigh it
-        
+
         # Calculate probabilities and gini for the belows
         total_below = below_white + below_red
         p_below_white = below_white / total_below if total_below != 0 else 0
@@ -307,7 +307,6 @@ class DecisionTree:
         proportion_above = total_above / total_dataset_size
         
         gini_total = gini_below * proportion_below + gini_above * proportion_above
-        
         return gini_total
     
     # TODO: finish function!
