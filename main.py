@@ -233,6 +233,8 @@ class DecisionTree:
 
         return weighted_below_entropy + weighted_above_entropy
 
+    # TODO: figure out calculate_entropy function
+    # TODO: determine how to split data based off information gain
     def calculate_optimal_entropy_split(self, X, y):
         """
         Return the best feature to split at and what value to split at
@@ -363,8 +365,47 @@ class DecisionTree:
 
     # 1.3 - Pruning
     # TODO: finish
-    def prune_tree(self, X, y, tree):
-        pass
+    def prune(self, X, y, tree):
+        """
+        Post-pruning: should prune leaves/subtrees of tree to 
+        reduce overfitting
+        """
+        # Return 0 if there's no data
+        if X == None:
+            return 0
+        # Return error of a single leaf
+        if tree.is_leaf():
+            return len(y) - y.count(tree.class_label)
+        
+        # Get majority label of tree
+        majority_label = self.most_common_label(y)
+        
+        #TODO: is feature_index the correct patameter?
+        x_1, y_1, x_2, y_2 = self.split_data(X, y, tree.feature_index)
+        
+        # Process: We need to get the accuracy of the left and right subtrees
+        # and compare that to the accuracy of the majority label. If replacing
+        # the subtree with a node that predicts the ML doesn't reduce the 
+        # accuracy of the tree, then go through with it. Pruning is a 
+        # bottom-up process from the leaves.
+        
+        # Calculate the label inaccuracies for ML, left, and right
+        majority_label_inaccuracy = len(y) - y.count(tree.class_label)
+        left_subtree_inaccurate_labels = self.prune(x_1, y_1, tree.left)
+        right_subtree_inaccurate_labels = self.prune(x_2, y_2, tree.right)
+        subtree_inaccuracy_total = left_subtree_inaccurate_labels + right_subtree_inaccurate_labels
+        
+        # Compare inaccuracies and replace w/ a node or not 
+        if subtree_inaccuracy_total > majority_label_inaccuracy:
+            # Prune the subtree
+            tree.left = None
+            tree.right = None
+            tree.class_label = majority_label
+            
+            # Return majority label up a recursive level if pruned
+            return majority_label_inaccuracy
+        
+        return subtree_inaccuracy_total
 
     def generate_feature_cols(self, X):
         """
