@@ -5,11 +5,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import random
-import math
 
 from sklearn.model_selection import train_test_split
-
 
 # TODO:
 # - implement prune function
@@ -59,7 +56,6 @@ class DecisionTree:
         node: the starting node of the tree (can be a subset of another tree)
         """
         # Base cases:
-        
         # If all data points have the same label, return a leaf with that label
         if len(set(y)) == 1:
             node.class_label = y[0]
@@ -165,24 +161,12 @@ class DecisionTree:
         """
         Split the data into two sections based off the feature_index
         """
-        # Create lists for splitting the data into 2 parts
-        x_below, y_below = [], []
-        x_above, y_above = [], []
-        
-        # Get split_threshold
-        column_values = [row[feature_index] for row in X]
+        feature_col = X[:,feature_index]
         split_threshold = np.median(column_values)
-        
-        # Divide features and corresponding labels into two sets
-        for i, row in enumerate(X):
-            feature = row[feature_index]
 
-            if feature <= split_threshold:
-                x_below.append(row)
-                y_below.append(y[i])
-            else:
-                x_above.append(row)
-                y_above.append(y[i])
+        below_threshold_mask = feature_col <= split_threshold
+        x_below, y_below = X[below_threshold_mask], y[below_threshold_mask]
+        x_above, y_above = X[~below_threshold_mask], y[~below_threshold_mask]
 
         return x_below, y_below, x_above, y_above
 
