@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 # TODO:
 # - implement prune function
 # - finish implementing gini index
-# - do we need to return split_threshold from calculate_optimal_entropy_split?
+# - do we need to return split_threshold from calculate_entropy_split?
 # - test the code
 
 # Classes
@@ -81,7 +81,7 @@ class DecisionTree:
         # Split data in 2 - split either using Gini Index or Entropy based on 
         # chosen parameter. Will likely require helper function to figure
         # out the best way to split.
-        optimal_col_index = self.calculate_optimal_tree_split(X, y)
+        optimal_col_index = self.calculate_tree_split(X, y)
         x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_col_index)
 
         # Set feature to split on and its threshold
@@ -170,13 +170,13 @@ class DecisionTree:
 
         return x_below, y_below, x_above, y_above
 
-    def calculate_optimal_tree_split(self, X, y):
+    def calculate_tree_split(self, X, y):
         if self.impurity_measure == 'gini':
-            return self.calculate_optimal_gini_index_split(X, y)
+            return self.calculate_col_gini_split(X, y)
         elif self.impurity_measure == 'entropy':
-            return self.calculate_optimal_entropy_split(X, y)
+            return self.calculate_entropy_split(X, y)
         else:
-            print("Error in calculate_optimal_tree_split() - invalid impurity measure")
+            print("Error in calculate_tree_split() - invalid impurity measure")
 
     def weighted_subset_entropy(self, df, split_threshold, dataset_size, which_half):
         """
@@ -206,7 +206,7 @@ class DecisionTree:
 
         return subset_weight * unweighted_entropy
 
-    def calc_entropy(self, X, y, feature_index):
+    def calc_col_entropy(self, X, y, feature_index):
         """
         Return a single value for entropy from a column of interest from X
         0 signifies white wine and 1 signifies red wine
@@ -227,7 +227,7 @@ class DecisionTree:
 
     # TODO: figure out calculate_entropy function
     # TODO: determine how to split data based off information gain
-    def calculate_optimal_entropy_split(self, X, y):
+    def calculate_entropy_split(self, X, y):
         """
         Return the best feature to split at and what value to split at
         """
@@ -240,7 +240,7 @@ class DecisionTree:
         optimal_info_gain, optimal_col_index = 0, 0
 
         for col_index in range(len(X[0])):
-            col_entropy = self.calc_entropy(col_index)
+            col_entropy = self.calc_col_entropy(col_index)
             information_gain = total_entropy - col_entropy
 
             # Update optimal information gain and column index
@@ -279,7 +279,7 @@ class DecisionTree:
 
         return subset_weight * unweighted_gini
 
-    def calculate_gini_index(self, X, y, feature_index):
+    def calculate_col_gini(self, X, y, feature_index):
         """
         Return a single value for Gini index from a column of interest from X.
         Gini Index is another impurity measurement. Will be similar to entropy 
@@ -299,11 +299,28 @@ class DecisionTree:
         return weighted_below_gini + weighted_above_gini
     
     # TODO: finish function!
-    def calculate_optimal_gini_index_split(self, X, y):
+    def calculate_col_gini_split(self, X, y):
         """
         Return best feature and index to split at
         """
-        pass
+        proportion_white = y.count(0) / len(y)
+        proportion_red = y.count(1) / len(y)
+        total_gini = 1 - proportion_white**2 - proportion_red**2
+
+        # Calculate information gain for each feature
+        optimal_info_gain, optimal_col_index = 0, 0
+
+        for col_index in range(len(X[0])):
+            col_entropy = self.calc_col_entropy(col_index)
+            information_gain = total_entropy - col_entropy
+
+            # Update optimal information gain and column index
+            if information_gain > optimal_info_gain:
+                optimal_info_gain = information_gain
+                optimal_col_index = col_index
+
+        # Return feature with the best information gain
+        return optimal_col_index
         
     def most_common_label(self, y):
         """
@@ -427,7 +444,7 @@ if __name__ == "__main__":
     # tree.learn(X, y, impurity_measure='entropy', prune='False')
     tree.split_data(X, y, 0)
 
-    # calc_entropy_result = tree.calculate_optimal_entropy_split(tree.X, tree.y)
-    # print("calc_entropy_result =", calc_entropy_result)
+    # calc_col_entropy_result = tree.calculate_entropy_split(tree.X, tree.y)
+    # print("calc_col_entropy_result =", calc_col_entropy_result)
 
-    tree.calculate_gini_index(X, y, 0)
+    tree.calculate_col_gini(X, y, 0)
