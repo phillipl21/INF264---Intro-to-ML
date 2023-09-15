@@ -39,12 +39,17 @@ class Node:
 
 class DecisionTree:
     def __init__(self):
+        """
+        root: the root Node for the tree
+        X and y: features and classes for each data point as Python lists
+        max_depth: the maximum depth to build the tree
+        """
         self.root = Node()
         self.X, self.y = read_data("wine_dataset.csv")
-        self.feature_cols = self.generate_feature_cols(self.X)
+        self.max_depth = 7
 
     # TODO: finish function
-    def create_tree(self, x, y, node):
+    def create_tree(self, x, y, node, current_depth):
         """
         Create a decision tree based on input data
         Modifies the node passed in directly
@@ -62,8 +67,10 @@ class DecisionTree:
             node.right = None
             return
 
-        # Elif all data points have identical feature values, return a leaf with the most common label
-        elif self.identical_features(x):
+        # Elif all data points have identical feature values
+        # or max depth is reached
+        # return a leaf with the most common label
+        elif self.identical_features(x) or current_depth == max_depth:
             node.class_label = self.most_common_label(y)
             node.left = None
             node.right = None
@@ -83,7 +90,7 @@ class DecisionTree:
 
         # Set feature to split on and its threshold
         node.feature_index = optimal_col_index
-        feature_col = self.feature_cols[optimal_col_index]
+        feature_col = np.array([row[i] for row in X])
         node.split_threshold = np.median(feature_col)
 
         # Run create_tree recursively right and left
@@ -146,7 +153,7 @@ class DecisionTree:
         # Get horizontal length of 2D array
         for i in range(len(X[0])):
             # Iterate through the columns of the array
-            column = self.feature_cols[i]
+            column = [row[i] for row in X]
             # Check for value uniqueness by comparing with the first value 
             for val in column:
                 if val is not column[0]:
@@ -318,10 +325,7 @@ class DecisionTree:
         """
         Return 0 or 1 depending on whichever is the most common label
         """
-        if y.count(0) > len(y) / 2:
-            return 0
-        else:
-            return 1
+        return max(y, key=y.count)
 
     def has_same_label(self, y):
         """
@@ -407,25 +411,6 @@ class DecisionTree:
             return majority_label_inaccuracy
         
         return subtree_inaccuracy_total
-
-    def generate_feature_cols(self, X):
-        """
-        Returns a hash map of all of the feature columns as lists
-
-        Ex. {
-            0: [f1, f2, ..., fn],
-            1: [g1, g2, ..., gn],
-            ...
-            n: [h1, h2, ..., hn]
-        }
-        Key: feature index
-        Value: feature column as a list
-        """
-        hashmap = {}
-        for i in range(len(X[0])):
-            hashmap[i] = [row[i] for row in X]
-
-        return hashmap
 
 # Other functions
 def read_data(filename):
