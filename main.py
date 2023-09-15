@@ -10,9 +10,9 @@ from sklearn.model_selection import train_test_split
 from sklearn import DecisionTreeClassifier # for 1.5 Comparison
 
 # TODO:
-# - finish implementing gini index
-# - do we need to return split_threshold from calculate_entropy_split?
-# - test the code
+# - implement print function
+# - test prune
+# - test tree creation
 
 # Classes
 class Node:
