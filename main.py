@@ -163,7 +163,6 @@ class DecisionTree:
         """
         Split the data into two sections based off the feature_index
         """
-        X, y = np.array(X), np.array(y)
         feature_col = X[:,feature_index]
         split_threshold = np.median(feature_col)
 
@@ -235,8 +234,9 @@ class DecisionTree:
         Return the best feature to split at and what value to split at
         """
         # Get total entropy for y
-        proportion_white = np.sum(y == 0) / len(y)
-        proportion_red = np.sum(y == 1) / len(y)
+        proportion_white = np.sum(y == 0.0) / len(y)
+        proportion_red = np.sum(y == 1.0) / len(y)
+
         total_entropy = -proportion_white * np.log2(proportion_white) - proportion_red * np.log2(proportion_red)
 
         # Calculate information gain for each feature
@@ -429,7 +429,7 @@ def read_data(filename):
         features = [float(x_val) for x_val in row]
         X.append(features)
 
-    return X, y
+    return np.array(X), np.array(y)
 
 # Main
 if __name__ == "__main__":
