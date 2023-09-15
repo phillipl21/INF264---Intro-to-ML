@@ -67,7 +67,7 @@ class Node:
         return not self.left and not self.right
 
 class DecisionTree:
-    def __init__(self):
+    def __init__(self, max_depth=15):
         """
         root: the root Node for the tree
         X and y: features and classes for each data point as Python lists
@@ -78,7 +78,7 @@ class DecisionTree:
         self.num_features = len(self.X[0])
         self.total_dataset_size = len(self.y)
         self.impurity_measure = None
-        self.max_depth = 15
+        self.max_depth = max_depth
 
     def create_tree(self, X, y, node, current_depth):
         """
@@ -248,9 +248,7 @@ class DecisionTree:
         Return the best feature to split at and what value to split at
         """
         # Get total entropy for y
-        proportion_white = np.sum(y == 0.0) / len(y)
-        proportion_red = np.sum(y == 1.0) / len(y)
-
+        proportion_white, proportion_red = np.sum(y == 0.0) / len(y), np.sum(y == 1.0) / len(y)
         total_entropy = -proportion_white * np.log2(proportion_white) - proportion_red * np.log2(proportion_red)
 
         # Calculate information gain for each feature
@@ -356,7 +354,6 @@ class DecisionTree:
         """
         if node:
             print(node)
-
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
 
@@ -370,10 +367,10 @@ class DecisionTree:
 
         Return value: a int representing the leaf node class label
         """
-
         if not node:
             print("Error in traverse: null node")
             return None
+
         # Return label if the node is a leaf
         if node.is_leaf() == True:
             return node.class_label
@@ -394,12 +391,13 @@ class DecisionTree:
         # Return 0 if there's no data
         if X == None or len(X) == 0:
             return 0
+
         # Return error of a single leaf
         if tree.is_leaf():
             return len(y) - y.count(tree.class_label)
         
         # Get majority label of tree
-        majority_label = self.most_common_label(y)
+        most_common_label = self.most_common_label(y)
         
         #TODO: is feature_index the correct patameter?
         x_1, y_1, x_2, y_2 = self.split_data(X, y, tree.feature_index)
@@ -411,20 +409,20 @@ class DecisionTree:
         # bottom-up process from the leaves.
         
         # Calculate the label inaccuracies for ML, left, and right
-        majority_label_inaccuracy = len(y) - y.count(tree.class_label)
+        most_common_label_inaccuracy = len(y) - y.count(tree.class_label)
         left_subtree_inaccurate_labels = self.prune(x_1, y_1, tree.left)
         right_subtree_inaccurate_labels = self.prune(x_2, y_2, tree.right)
         subtree_inaccuracy_total = left_subtree_inaccurate_labels + right_subtree_inaccurate_labels
         
         # Compare inaccuracies and replace w/ a node or not 
-        if subtree_inaccuracy_total > majority_label_inaccuracy:
+        if subtree_inaccuracy_total > most_common_label_inaccuracy:
             # Prune the subtree
             tree.left = None
             tree.right = None
-            tree.class_label = majority_label
+            tree.class_label = most_common_label
             
             # Return majority label up a recursive level if pruned
-            return majority_label_inaccuracy
+            return most_common_label_inaccuracy
         
         return subtree_inaccuracy_total
 
@@ -443,6 +441,32 @@ class DecisionTree:
 
         pct_correct = (predicted_labels == y).sum() / self.total_dataset_size
         return pct_correct
+    
+def graph_accuracy(max_depth):
+    """
+    Graph the accuracies of decision trees from depths 1 to max_depth (inclusive)
+    """
+    depths = []
+    accuracies = []
+
+
+    for depth in range(1, max_depth + 1):
+        print("depth: ", depth)
+        tree = DecisionTree(depth)
+        tree.learn(X, y, 'entropy')
+        accuracy = tree.accuracy()
+
+        depths.append(depth)
+        accuracies.append(accuracy)
+    
+    plt.plot(depths, accuracies)
+    plt.xlabel('Decision Tree Depth')  # Set the label for the x-axis
+    plt.ylabel('Accuracy')  # Set the label for the y-axis
+    plt.title('The Effect of Decision Tree Depth on Observed Dataset Accuracy')  # Set the title of the chart
+    plt.grid(True)  # Display a grid
+    plt.ylim(0.25, 1)
+    plt.show()  # Display the chart
+
 
 # Other functions
 def read_data(filename):
@@ -451,7 +475,6 @@ def read_data(filename):
     """
     # Feature and label matrices
     X, y = [], []
-
     df = pd.read_csv("wine_dataset.csv")
 
     for i in range(len(df)):
@@ -471,7 +494,9 @@ if __name__ == "__main__":
     csv_file = "wine_dataset.csv"
     X, y = read_data(csv_file)
 
-    tree = DecisionTree()
-    tree.learn(X, y, 'entropy')
-    tree.print_subtree(tree.root)
-    print("tree accuracy:", tree.accuracy())
+    # tree = DecisionTree()
+    # tree.learn(X, y, 'entropy')
+    # tree.print_subtree(tree.root)
+    # print("tree accuracy:", tree.accuracy())
+
+    graph_accuracy(15)
