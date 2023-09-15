@@ -7,7 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
-from sklearn import DecisionTreeClassifier # for 1.5 Comparison
+from sklearn.tree import DecisionTreeClassifier # for 1.5 Comparison
 
 # TODO:
 # - implement print function
