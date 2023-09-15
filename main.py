@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 
 # Classes
 class Node:
-    def __init__(self, feature_index=None, split_threshold=None, class_label=None, left=None, right=None):
+    def __init__(self, depth, feature_index=None, split_threshold=None, class_label=None, left=None, right=None):
         """
         Parameters:
          - feature_index: int specifying which feature to split on
@@ -29,6 +29,38 @@ class Node:
         self.class_label = class_label
         self.left = left
         self.right = right
+        self.depth = depth
+
+    def __str__(self):
+        """
+        Return a string representation of the node
+        """
+        feature_string = ""
+
+        # Get feature name
+        feature_name = ""
+        if self.feature_index == 0:
+            feature_name = 'citric acid'
+        elif self.feature_index == 1:
+            feature_name = 'residual sugar'
+        elif self.feature_index == 2:
+            feature_name = 'pH'
+        elif self.feature_index == 3:
+            feature_name = 'sulphates' 
+        elif self.feature_index == 4:
+            feature_name = 'alcohol'
+
+        # Get class label
+        class_label = ""
+        if self.class_label == 0:
+            class_label = 'white'
+        elif self.class_label == 1:
+            class_label = 'red'
+
+        if self.is_leaf():
+            return f"Depth: {self.depth}, Class label: {class_label}"
+        else:
+            return f"Depth: {self.depth}, Feature: {feature_name}, Split threshold: {self.split_threshold}"
 
     def is_leaf(self):
         return not self.left and not self.right
@@ -40,11 +72,12 @@ class DecisionTree:
         X and y: features and classes for each data point as Python lists
         max_depth: the maximum depth to build the tree
         """
-        self.root = Node()
+        self.root = Node(0)
         self.X, self.y = read_data("wine_dataset.csv")
         self.num_features = len(self.X[0])
+        self.total_dataset_size = len(self.y)
         self.impurity_measure = None
-        self.max_depth = 5
+        self.max_depth = 7
 
     # TODO: finish function
     def create_tree(self, X, y, node, current_depth):
@@ -74,14 +107,6 @@ class DecisionTree:
             return
 
         # Else create decision tree
-        # - Choose a feature with the most infomation gain
-        # - Split the data based on the feature's value and add a branch for each subset of data
-        # - For each branch, call the algorithm recursively on the data points for that specific branch
-        
-        # For pruning, need to run a majority_label function
-        # Split data in 2 - split either using Gini Index or Entropy based on 
-        # chosen parameter. Will likely require helper function to figure
-        # out the best way to split.
         optimal_col_index = self.calculate_tree_split(X, y)
         x_1, y_1, x_2, y_2 = self.split_data(X, y, optimal_col_index)
 
@@ -92,11 +117,11 @@ class DecisionTree:
 
         # Run create_tree recursively right and left
         if len(y_1) != 0: # If data set exists
-            node.left = Node()
+            node.left = Node(current_depth + 1)
             self.create_tree(x_1, y_1, node.left, current_depth + 1)
             
         if len(y_2) != 0:
-            node.right = Node()
+            node.right = Node(current_depth + 1)
             self.create_tree(x_2, y_2, node.right, current_depth + 1)
 
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
@@ -132,10 +157,10 @@ class DecisionTree:
         - x: a data point
 
         Return value:
-        - class_label
+        - class_label: the predicted class label for that data point
         """
         # Basically just a wrapper for traverse
-        return self.traverse(x, self.tree)
+        return self.traverse(x, self.root)
 
     # Helper methods
     # TODO: finish function
@@ -340,7 +365,8 @@ class DecisionTree:
         Prints the subtree starting at the specified node
         """
         if node:
-            print(f"Depth: {depth} Data: {node.data}")
+            print(node)
+
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
 
@@ -409,6 +435,22 @@ class DecisionTree:
         
         return subtree_inaccuracy_total
 
+    def accuracy(self):
+        """
+        Return the accuracy of the decision tree
+        """
+
+        # Get all of the predictions for each data point
+        predicted_labels = np.empty((0,0))
+
+        for i in range(self.total_dataset_size):
+            data_point = X[i]
+            prediction = self.predict(data_point)
+            predicted_labels = np.append(predicted_labels, prediction)
+
+        pct_correct = (predicted_labels == y).sum() / self.total_dataset_size
+        return pct_correct
+
 # Other functions
 def read_data(filename):
     """
@@ -439,3 +481,4 @@ if __name__ == "__main__":
     tree = DecisionTree()
     tree.learn(X, y, 'entropy')
     tree.print_subtree(tree.root)
+    print("tree accuracy:", tree.accuracy())
