@@ -7,9 +7,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
+from sklearn import DecisionTreeClassifier # for 1.5 Comparison
 
 # TODO:
-# - implement prune function
 # - finish implementing gini index
 # - do we need to return split_threshold from calculate_entropy_split?
 # - test the code
@@ -47,7 +47,6 @@ class DecisionTree:
         self.impurity_measure = None
         self.max_depth = 5
 
-    # TODO: finish function
     def create_tree(self, X, y, node, current_depth):
         """
         Create a decision tree based on input data
@@ -124,7 +123,6 @@ class DecisionTree:
 
         return self
 
-    # TODO: finish function
     def predict(self, x):
         """
         Predicts the class label based on a single data point x
@@ -139,7 +137,6 @@ class DecisionTree:
         return self.traverse(x, self.tree)
 
     # Helper methods
-    # TODO: finish function
     def identical_features(self, X):
         """
         Return True if all the features in each column of X are identical
@@ -367,7 +364,6 @@ class DecisionTree:
             return self.traverse(x, node.right)
 
     # 1.3 - Pruning
-    # TODO: finish
     def prune(self, X, y, tree):
         """
         Post-pruning: should prune leaves/subtrees of tree to 
