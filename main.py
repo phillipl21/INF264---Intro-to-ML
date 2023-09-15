@@ -170,16 +170,8 @@ class DecisionTree:
             print("identical_features() - No values found in array.")
             return False
 
-        # Get horizontal length of 2D array
-        for i in range(self.num_features):
-            # Iterate through the columns of the array
-            column = [row[i] for row in X]
-            # Check for value uniqueness by comparing with the first value 
-            for val in column:
-                if val is not column[0]:
-                    return False
-
-        return True
+        all_rows_same = np.all(X == X[0, :])
+        return all_rows_same
 
     def split_data(self, X, y, feature_index):
         """
@@ -400,7 +392,7 @@ class DecisionTree:
         reduce overfitting
         """
         # Return 0 if there's no data
-        if X == None:
+        if X == None or len(X) == 0:
             return 0
         # Return error of a single leaf
         if tree.is_leaf():
