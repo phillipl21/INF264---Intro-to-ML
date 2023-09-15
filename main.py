@@ -9,10 +9,9 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # TODO:
-# - implement prune function
-# - finish implementing gini index
-# - do we need to return split_threshold from calculate_entropy_split?
-# - test the code
+# - implement print function
+# - test prune
+# - test tree creation
 
 # Classes
 class Node:
