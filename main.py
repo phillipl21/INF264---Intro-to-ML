@@ -10,9 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier # for 1.5 Comparison
 
 # TODO:
-# - implement print function
-# - test prune
-# - test tree creation
+# - compare decision tree against DecisionTreeClassifier
 
 # Classes
 class Node:
