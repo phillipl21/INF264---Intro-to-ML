@@ -78,7 +78,7 @@ class DecisionTree:
         self.num_features = len(self.X[0])
         self.total_dataset_size = len(self.y)
         self.impurity_measure = None
-        self.max_depth = 7
+        self.max_depth = 15
 
     def create_tree(self, X, y, node, current_depth):
         """
@@ -378,6 +378,10 @@ class DecisionTree:
 
         Return value: a int representing the leaf node class label
         """
+
+        if not node:
+            print("Error in traverse: null node")
+            return None
         # Return label if the node is a leaf
         if node.is_leaf() == True:
             return node.class_label
