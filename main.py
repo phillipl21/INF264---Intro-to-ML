@@ -341,7 +341,7 @@ class DecisionTree:
         Prints the subtree starting at the specified node
         """
         if node:
-            print(f"Depth: {node.depth} Data: {node.data}")
+            print(f"Depth: {depth} Data: {node.data}")
             self.print_subtree(node.left, depth + 1)
             self.print_subtree(node.right, depth + 1)
 
@@ -439,3 +439,4 @@ if __name__ == "__main__":
 
     tree = DecisionTree()
     tree.learn(X, y, 'entropy')
+    tree.print_subtree(tree.root)
