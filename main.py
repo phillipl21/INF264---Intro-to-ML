@@ -43,6 +43,7 @@ class DecisionTree:
         """
         self.root = Node()
         self.X, self.y = read_data("wine_dataset.csv")
+        self.num_features = len(self.X[0])
         self.max_depth = 7
 
     # TODO: finish function
@@ -147,7 +148,7 @@ class DecisionTree:
             return False
 
         # Get horizontal length of 2D array
-        for i in range(len(X[0])):
+        for i in range(self.num_features):
             # Iterate through the columns of the array
             column = [row[i] for row in X]
             # Check for value uniqueness by comparing with the first value 
@@ -239,7 +240,7 @@ class DecisionTree:
         # Calculate information gain for each feature
         optimal_info_gain, optimal_col_index = 0, 0
 
-        for col_index in range(len(X[0])):
+        for col_index in range(self.num_features):
             col_entropy = self.calc_col_entropy(col_index)
             information_gain = total_entropy - col_entropy
 
@@ -303,24 +304,17 @@ class DecisionTree:
         """
         Return best feature and index to split at
         """
-        proportion_white = y.count(0) / len(y)
-        proportion_red = y.count(1) / len(y)
-        total_gini = 1 - proportion_white**2 - proportion_red**2
-
         # Calculate information gain for each feature
-        optimal_info_gain, optimal_col_index = 0, 0
+        best_gini , best_col = 999, 0
 
-        for col_index in range(len(X[0])):
-            col_entropy = self.calc_col_entropy(col_index)
-            information_gain = total_entropy - col_entropy
+        for col_index in range(self.num_features):
+            gini = self.calculate_col_gini(X, y, col_index)
 
             # Update optimal information gain and column index
-            if information_gain > optimal_info_gain:
-                optimal_info_gain = information_gain
-                optimal_col_index = col_index
+            if gini < best_gini:
+                best_gini, best_col = gini, col_index
 
-        # Return feature with the best information gain
-        return optimal_col_index
+        return best_col
         
     def most_common_label(self, y):
         """
