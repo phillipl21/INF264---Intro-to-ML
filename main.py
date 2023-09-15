@@ -44,10 +44,11 @@ class DecisionTree:
         self.root = Node()
         self.X, self.y = read_data("wine_dataset.csv")
         self.num_features = len(self.X[0])
-        self.max_depth = 7
+        self.impurity_measure = None
+        self.max_depth = 5
 
     # TODO: finish function
-    def create_tree(self, x, y, node, current_depth):
+    def create_tree(self, X, y, node, current_depth):
         """
         Create a decision tree based on input data
         Modifies the node passed in directly
@@ -67,7 +68,7 @@ class DecisionTree:
         # Elif all data points have identical feature values
         # or max depth is reached
         # return a leaf with the most common label
-        elif self.identical_features(x) or current_depth == max_depth:
+        elif self.identical_features(X) or current_depth == self.max_depth:
             node.class_label = self.most_common_label(y)
             node.left = None
             node.right = None
@@ -87,17 +88,17 @@ class DecisionTree:
 
         # Set feature to split on and its threshold
         node.feature_index = optimal_col_index
-        feature_col = np.array([row[i] for row in X])
+        feature_col = np.array([row[node.feature_index] for row in X])
         node.split_threshold = np.median(feature_col)
 
         # Run create_tree recursively right and left
         if len(y_1) != 0: # If data set exists
             node.left = Node()
-            self.create_tree(x_1, y_1, node.left)
+            self.create_tree(x_1, y_1, node.left, current_depth + 1)
             
         if len(y_2) != 0:
             node.right = Node()
-            self.create_tree(x_2, y_2, node.right)
+            self.create_tree(x_2, y_2, node.right, current_depth + 1)
 
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
@@ -115,10 +116,10 @@ class DecisionTree:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
 
         # Create the decision tree
-        self.create_tree(X_train, y_train, self.root)
+        self.create_tree(X_train, y_train, self.root, 1)
 
         # Prune the tree if needed
-        if prune:
+        if prune == True:
             self.prune(X_test, y_test, self.root)
 
         return self
@@ -162,8 +163,9 @@ class DecisionTree:
         """
         Split the data into two sections based off the feature_index
         """
+        X, y = np.array(X), np.array(y)
         feature_col = X[:,feature_index]
-        split_threshold = np.median(column_values)
+        split_threshold = np.median(feature_col)
 
         below_threshold_mask = feature_col <= split_threshold
         x_below, y_below = X[below_threshold_mask], y[below_threshold_mask]
@@ -233,15 +235,15 @@ class DecisionTree:
         Return the best feature to split at and what value to split at
         """
         # Get total entropy for y
-        proportion_white = y.count(0) / len(y)
-        proportion_red = y.count(1) / len(y)
+        proportion_white = np.sum(y == 0) / len(y)
+        proportion_red = np.sum(y == 1) / len(y)
         total_entropy = -proportion_white * np.log2(proportion_white) - proportion_red * np.log2(proportion_red)
 
         # Calculate information gain for each feature
         optimal_info_gain, optimal_col_index = 0, 0
 
         for col_index in range(self.num_features):
-            col_entropy = self.calc_col_entropy(col_index)
+            col_entropy = self.calc_col_entropy(X, y, col_index)
             information_gain = total_entropy - col_entropy
 
             # Update optimal information gain and column index
@@ -320,7 +322,8 @@ class DecisionTree:
         """
         Return 0 or 1 depending on whichever is the most common label
         """
-        return max(y, key=y.count)
+        proportion_white = np.sum(y == 0) / len(y)
+        return 0 if proportion_white > 0.5 else 1
 
     def has_same_label(self, y):
         """
@@ -435,10 +438,4 @@ if __name__ == "__main__":
     X, y = read_data(csv_file)
 
     tree = DecisionTree()
-    # tree.learn(X, y, impurity_measure='entropy', prune='False')
-    tree.split_data(X, y, 0)
-
-    # calc_col_entropy_result = tree.calculate_entropy_split(tree.X, tree.y)
-    # print("calc_col_entropy_result =", calc_col_entropy_result)
-
-    tree.calculate_col_gini(X, y, 0)
+    tree.learn(X, y, 'entropy')
