@@ -11,6 +11,8 @@ from sklearn.tree import DecisionTreeClassifier # for 1.5 Comparison
 
 # TODO:
 # - compare decision tree against DecisionTreeClassifier
+#   - get accuracy comparison
+#   - get speed comparison
 
 # Classes
 class Node:
@@ -134,9 +136,6 @@ class DecisionTree:
         # Store this for later functions in the class
         self.impurity_measure = impurity_measure
 
-        # Split data into training and validation sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
-
         # Create the decision tree
         self.create_tree(X_train, y_train, self.root, 1)
 
@@ -239,8 +238,6 @@ class DecisionTree:
 
         return weighted_below_entropy + weighted_above_entropy
 
-    # TODO: figure out calculate_entropy function
-    # TODO: determine how to split data based off information gain
     def calculate_entropy_split(self, X, y):
         """
         Return the best feature to split at and what value to split at
@@ -311,7 +308,6 @@ class DecisionTree:
 
         return weighted_below_gini + weighted_above_gini
     
-    # TODO: finish function!
     def calculate_col_gini_split(self, X, y):
         """
         Return best feature and index to split at
@@ -397,7 +393,7 @@ class DecisionTree:
         # Get majority label of tree
         most_common_label = self.most_common_label(y)
         
-        #TODO: is feature_index the correct patameter?
+        # Split data into two halves
         x_1, y_1, x_2, y_2 = self.split_data(X, y, tree.feature_index)
         
         # Process: We need to get the accuracy of the left and right subtrees
@@ -489,12 +485,22 @@ def read_data(filename):
 # Main
 if __name__ == "__main__":
     print("INF264 Project 1")
+
+    # Import data and preprocess it
     csv_file = "wine_dataset.csv"
     X, y = read_data(csv_file)
+    
+    # Split data into training and validation sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
 
     # tree = DecisionTree()
     # tree.learn(X, y, 'entropy')
     # tree.print_subtree(tree.root)
     # print("tree accuracy:", tree.accuracy())
 
-    graph_accuracy(15)
+    # graph_accuracy(15)
+
+    # Test DecisionTreeClassifier on the data
+    sklearn_tree = DecisionTreeClassifier()
+    sklearn_tree.fit(X_train, y_train)
+    predictions = sklearn_tree.predict(X)
