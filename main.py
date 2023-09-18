@@ -438,19 +438,18 @@ class DecisionTree:
         pct_correct = (predicted_labels == y_test).sum() / test_size
         return pct_correct
     
-def graph_accuracy(max_depth):
+def graph_accuracy(max_depth, X_test, y_test):
     """
     Graph the accuracies of decision trees from depths 1 to max_depth (inclusive)
     """
     depths = []
     accuracies = []
 
-
     for depth in range(1, max_depth + 1):
         print("depth: ", depth)
         tree = DecisionTree(depth)
         tree.learn(X, y, 'entropy')
-        accuracy = tree.accuracy()
+        accuracy = tree.accuracy(X_test, y_test)
 
         depths.append(depth)
         accuracies.append(accuracy)
@@ -491,19 +490,19 @@ if __name__ == "__main__":
     # Import data and preprocess it
     csv_file = "wine_dataset.csv"
     X, y = read_data(csv_file)
-    
+    impurity_measure = 'entropy'
+
     # Split data into training and validation sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
 
-    # Create and test a tree
-    impurity_measure = 'entropy'
-    
+    graph_accuracy(20, X_test, y_test)
+
+    # Create and test our decision tree
     start_time = time.time()
     tree = DecisionTree()
     tree.learn(X_train, y_train, impurity_measure)
     end_time = time.time() - start_time
     
-    # tree.print_subtree(tree.root)
     print("Our tree implementation accuracy:", tree.tree_accuracy(X_test, y_test))
     print(f"Time to create and learn our decision tree: {end_time} seconds")
 
