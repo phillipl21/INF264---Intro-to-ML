@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier # for 1.5 Comparison
+from sklearn.metrics import accuracy_score
 
 # TODO:
 # - compare decision tree against DecisionTreeClassifier
@@ -67,7 +68,7 @@ class Node:
         return not self.left and not self.right
 
 class DecisionTree:
-    def __init__(self, max_depth=15):
+    def __init__(self, max_depth=20):
         """
         root: the root Node for the tree
         X and y: features and classes for each data point as Python lists
@@ -420,20 +421,24 @@ class DecisionTree:
         
         return subtree_inaccuracy_total
 
-    def accuracy(self):
+    def tree_accuracy(self, X_test, y_test):
         """
         Return the accuracy of the decision tree
         """
-
         # Get all of the predictions for each data point
         predicted_labels = np.empty((0,0))
+        test_size = len(X_test)
 
-        for i in range(self.total_dataset_size):
-            data_point = X[i]
+        for i in range(test_size):
+            data_point = X_test[i]
             prediction = self.predict(data_point)
             predicted_labels = np.append(predicted_labels, prediction)
 
-        pct_correct = (predicted_labels == y).sum() / self.total_dataset_size
+        pct_correct = (predicted_labels == y_test).sum() / test_size
+        print("pct_correct =", pct_correct)
+        print("accuracy_score =", accuracy_score(predicted_labels, y_test))
+        print(f"In accuracy(): pct_correct == accuracy_score(): {pct_correct == accuracy_score(predicted_labels, y_test)}")
+
         return pct_correct
     
 def graph_accuracy(max_depth):
@@ -493,14 +498,20 @@ if __name__ == "__main__":
     # Split data into training and validation sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
 
-    # tree = DecisionTree()
-    # tree.learn(X, y, 'entropy')
-    # tree.print_subtree(tree.root)
-    # print("tree accuracy:", tree.accuracy())
+    # Create and test a tree
+    impurity_measure = 'gini'
+    tree = DecisionTree()
+    tree.learn(X_train, y_train, impurity_measure)
+    tree.print_subtree(tree.root)
+    print("tree accuracy:", tree.tree_accuracy(X_test, y_test))
 
     # graph_accuracy(15)
 
     # Test DecisionTreeClassifier on the data
-    sklearn_tree = DecisionTreeClassifier()
+    sklearn_tree = DecisionTreeClassifier(criterion=impurity_measure)
     sklearn_tree.fit(X_train, y_train)
-    predictions = sklearn_tree.predict(X)
+    predictions = sklearn_tree.predict(X_test)
+    sklearn_accuracy = accuracy_score(y_test, predictions)
+
+    print("sklearn accuracy:", sklearn_accuracy)
+    print("sklearn tree depth:", sklearn_tree.tree_.max_depth)
