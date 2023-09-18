@@ -2,6 +2,7 @@
 # Phillip Lei and Ryan Huynh
 
 # Import libraries
+import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -435,10 +436,6 @@ class DecisionTree:
             predicted_labels = np.append(predicted_labels, prediction)
 
         pct_correct = (predicted_labels == y_test).sum() / test_size
-        print("pct_correct =", pct_correct)
-        print("accuracy_score =", accuracy_score(predicted_labels, y_test))
-        print(f"In accuracy(): pct_correct == accuracy_score(): {pct_correct == accuracy_score(predicted_labels, y_test)}")
-
         return pct_correct
     
 def graph_accuracy(max_depth):
@@ -499,19 +496,26 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
 
     # Create and test a tree
-    impurity_measure = 'gini'
+    impurity_measure = 'entropy'
+    
+    start_time = time.time()
     tree = DecisionTree()
     tree.learn(X_train, y_train, impurity_measure)
-    tree.print_subtree(tree.root)
-    print("tree accuracy:", tree.tree_accuracy(X_test, y_test))
-
-    # graph_accuracy(15)
+    end_time = time.time() - start_time
+    
+    # tree.print_subtree(tree.root)
+    print("Our tree implementation accuracy:", tree.tree_accuracy(X_test, y_test))
+    print(f"Time to create and learn our decision tree: {end_time} seconds")
 
     # Test DecisionTreeClassifier on the data
+    start_time = time.time()
     sklearn_tree = DecisionTreeClassifier(criterion=impurity_measure)
     sklearn_tree.fit(X_train, y_train)
     predictions = sklearn_tree.predict(X_test)
+    end_time = time.time() - start_time
+
     sklearn_accuracy = accuracy_score(y_test, predictions)
 
     print("sklearn accuracy:", sklearn_accuracy)
     print("sklearn tree depth:", sklearn_tree.tree_.max_depth)
+    print(f"Time to create and learn sklearn decision tree: {end_time} seconds")
