@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier # for 1.5 Comparison
 from sklearn.metrics import accuracy_score
+from copy import deepcopy
 
 # Classes
 class Node:
@@ -64,20 +65,20 @@ class Node:
         return not self.left and not self.right
 
 class DecisionTree:
-    def __init__(self, max_depth=20):
+    def __init__(self, tree_depth=0):
         """
         root: the root Node for the tree
         X and y: features and classes for each data point as Python lists
-        max_depth: the maximum depth to build the tree
+        tree_depth: the maximum depth to build the tree
         """
         self.root = Node(0)
         self.X, self.y = read_data("wine_dataset.csv")
         self.num_features = len(self.X[0])
         self.total_dataset_size = len(self.y)
         self.impurity_measure = None
-        self.max_depth = max_depth
+        self.tree_depth = tree_depth
 
-    def create_tree(self, X, y, node, current_depth):
+    def create_tree(self, X, y, node, current_depth, tree_depth):
         """
         Create a decision tree based on input data
         Modifies the node passed in directly
@@ -97,7 +98,7 @@ class DecisionTree:
         # Elif all data points have identical feature values
         # or max depth is reached
         # return a leaf with the most common label
-        elif self.identical_features(X) or current_depth == self.max_depth:
+        elif self.identical_features(X) or current_depth == tree_depth:
             node.class_label = self.most_common_label(y)
             node.left = None
             node.right = None
@@ -115,11 +116,11 @@ class DecisionTree:
         # Run create_tree recursively right and left
         if len(y_1) != 0: # If data set exists
             node.left = Node(current_depth + 1)
-            self.create_tree(x_1, y_1, node.left, current_depth + 1)
+            self.create_tree(x_1, y_1, node.left, current_depth + 1, tree_depth)
             
         if len(y_2) != 0:
             node.right = Node(current_depth + 1)
-            self.create_tree(x_2, y_2, node.right, current_depth + 1)
+            self.create_tree(x_2, y_2, node.right, current_depth + 1, tree_depth)
 
     def learn(self, X, y, impurity_measure='entropy', prune='False'):
         """
@@ -133,8 +134,33 @@ class DecisionTree:
         # Store this for later functions in the class
         self.impurity_measure = impurity_measure
 
-        # Create the decision tree
-        self.create_tree(X_train, y_train, self.root, 1)
+        # If a tree depth is specified
+        # build a tree up to that depth
+        if self.tree_depth > 0:
+            self.create_tree(X_train, y_train, self.root, 1, self.tree_depth)
+        
+        # Otherwise, pick the best tree less than max_depth
+        else:
+            trees = {}
+            max_depth = 25
+
+            for depth in range(1, max_depth + 1):
+                tree = self.create_tree(X_train, y_train, self.root, 1, depth)
+                accuracy = self.tree_accuracy(X_train, y_train)
+                trees[depth] = (deepcopy(self.root), accuracy)
+            
+            # Find best tree
+            best_accuracy = 0
+            best_tree = None
+            best_depth = 0
+            for depth in trees:
+                if trees[depth][1] > best_accuracy:
+                    best_depth = depth
+                    best_accuracy = trees[depth][1]
+                    best_tree = trees[depth][0]
+
+            print("\nOptimal depth:", best_depth)
+            self.root = best_tree
 
         # Prune the tree if needed
         if prune == True:
@@ -481,6 +507,7 @@ def read_data(filename):
 # Main
 if __name__ == "__main__":
     print("INF264 Project 1")
+    print("By Phillip Lei and Ryan Huynh")
 
     # Import data and preprocess it
     csv_file = "wine_dataset.csv"
@@ -490,16 +517,14 @@ if __name__ == "__main__":
     # Split data into training and validation sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True)
 
-    graph_accuracy(20, X_test, y_test)
-
     # Create and test our decision tree
     start_time = time.time()
     tree = DecisionTree()
     tree.learn(X_train, y_train, impurity_measure)
     end_time = time.time() - start_time
     
-    print("Our tree implementation accuracy:", tree.tree_accuracy(X_test, y_test))
-    print(f"Time to create and learn our decision tree: {end_time} seconds")
+    print(f"Our tree implementation accuracy: {tree.tree_accuracy(X_test, y_test):.4f}")
+    print(f"Time to create and learn our decision tree: {end_time:.4f} seconds\n")
 
     # Test DecisionTreeClassifier on the data
     start_time = time.time()
@@ -510,6 +535,6 @@ if __name__ == "__main__":
 
     sklearn_accuracy = accuracy_score(y_test, predictions)
 
-    print("sklearn accuracy:", sklearn_accuracy)
+    print(f"sklearn accuracy: {sklearn_accuracy:.4f}")
     print("sklearn tree depth:", sklearn_tree.tree_.max_depth)
-    print(f"Time to create and learn sklearn decision tree: {end_time} seconds")
+    print(f"Time to create and learn sklearn decision tree: {end_time:.4f} seconds\n")
