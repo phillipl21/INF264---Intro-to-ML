@@ -449,7 +449,7 @@ def graph_accuracy(max_depth, X_test, y_test):
         print("depth: ", depth)
         tree = DecisionTree(depth)
         tree.learn(X, y, 'entropy')
-        accuracy = tree.accuracy(X_test, y_test)
+        accuracy = tree.tree_accuracy(X_test, y_test)
 
         depths.append(depth)
         accuracies.append(accuracy)
