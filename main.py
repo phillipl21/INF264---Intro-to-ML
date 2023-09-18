@@ -11,11 +11,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier # for 1.5 Comparison
 from sklearn.metrics import accuracy_score
 
-# TODO:
-# - compare decision tree against DecisionTreeClassifier
-#   - get accuracy comparison
-#   - get speed comparison
-
 # Classes
 class Node:
     def __init__(self, depth, feature_index=None, split_threshold=None, class_label=None, left=None, right=None):
